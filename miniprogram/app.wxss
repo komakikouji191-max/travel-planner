@@ -1,0 +1,1 @@
+page{background:#f7f8f2;color:#293d36;font-family:-apple-system,sans-serif;font-size:28rpx}button{font-size:26rpx;border-radius:14rpx}button::after{border:0}input,textarea{box-sizing:border-box}button.primary{background:#47765c;color:#fff}button.secondary{background:#e9efe5;color:#47765c}.muted{color:#8a938b;font-size:24rpx}
