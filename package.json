@@ -1,7 +1,10 @@
 {
   "name": "travel-planner",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "type": "module",
-  "scripts": { "dev": "node server.js", "start": "node server.js", "check": "node --check app.js && node --check server.js" }
+  "description": "旅迹 ROAM 原生微信旅行回忆小程序",
+  "scripts": {
+    "check": "node scripts/check-project.cjs",
+    "test": "node --test tests/miniprogram.test.cjs"
+  }
 }

@@ -1,0 +1,10 @@
+<view class="preview-page">
+ <view class="title">旅迹 / ROAM</view>
+ <view class="caption">{{titles[current]}} · {{current + 1}} / 4</view>
+ <view class="hint">左右滑动切换 · 点击图片放大</view>
+ <swiper class="screens" current="{{current}}" bindchange="change" indicator-dots indicator-color="#c5b493" indicator-active-color="#334d5d">
+  <swiper-item wx:for="{{images}}" wx:key="*this"><image class="screen" src="{{item}}" mode="aspectFit" data-url="{{item}}" bindtap="preview"/></swiper-item>
+ </swiper>
+ <button class="outline" bindtap="overview">查看完整设计图</button>
+ <view class="hint note">这里是设计参考图。返回首页可操作当前已实现的小程序；参考图中的部分地图和动画效果尚待完善。</view>
+</view>

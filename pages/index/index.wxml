@@ -1,0 +1,467 @@
+<view class="app {{tab === 'light' ? 'night' : ''}}">
+  <view class="masthead"
+    ><text class="wordmark">旅迹 / ROAM</text
+    ><text class="edition">私人旅行手账</text></view
+  >
+  <view wx:if="{{demo}}" class="demo" bindtap="clearDemo"
+    >含示例插画手账 · 点击仅移除内置示例 ↗</view
+  >
+  <view class="design-entry" bindtap="openDesign"><text>✦ 页面设计参考已内置</text><text>查看四张大图 ↗</text></view>
+  <block wx:if="{{detail && active}}">
+    <view class="backline"
+      ><text bindtap="back">← 返回</text
+      ><view
+        ><text bindtap="editTrip">编辑</text> ·
+        <text bindtap="deleteTrip">删除旅行</text></view
+      ></view
+    >
+    <view class="city-title"
+      >{{active.city}}<text>{{active.country}}</text></view
+    ><view class="eyebrow">{{active.date}} — {{active.end}}</view
+    ><view class="poem">{{active.note || '把路上的片刻，留在这里。'}}</view>
+    <view class="section-tabs"
+      ><text
+        class="{{mode === 'film' ? 'chosen' : ''}}"
+        data-value="film"
+        bindtap="mode"
+        >回忆胶卷</text
+      ><text
+        class="{{mode === 'timeline' ? 'chosen' : ''}}"
+        data-value="timeline"
+        bindtap="mode"
+        >每日足迹</text
+      ><text bindtap="addStop">＋ 留下片刻</text></view
+    >
+    <block wx:if="{{mode === 'film'}}"
+      ><view class="film-hint">← 轻拨胶卷 · 点击照片放大 →</view
+      ><scroll-view
+        scroll-x
+        enhanced
+        show-scrollbar="{{false}}"
+        class="film-scroll"
+        bindtouchstart="touchStart"
+        bindtouchmove="touchMove"
+        bindtouchend="touchEnd"
+        bindtouchcancel="touchEnd"
+        ><view class="film" style="transform:rotate({{tilt}}deg)"
+          ><view
+            wx:for="{{photos}}"
+            wx:key="url"
+            class="frame"
+            data-urls="{{photoUrls}}"
+            data-url="{{item.url}}"
+            bindtap="preview"
+            ><view class="film-code"
+              >ROAM MEMORY / {{index + 1}} <text>✦</text></view
+            ><image src="{{item.url}}" mode="aspectFill" /><view
+              class="film-code"
+              >{{item.date}} · {{item.time}}</view
+            ></view
+          ><view
+            wx:if="{{!photos.length}}"
+            class="empty film-empty"
+            bindtap="addStop"
+            >这卷胶片还空着 ＋ 收藏第一张照片</view
+          ></view
+        ></scroll-view
+      ><view class="serif quote">风经过的地方，都成了回忆。</view
+      ><view class="photo-caption" wx:for="{{photos}}" wx:key="url"
+        ><text>{{item.name}}</text
+        ><text>{{item.kind === '普通' ? 'MEMORY' : item.kind}}</text></view
+      ></block
+    >
+    <block wx:else
+      ><scroll-view scroll-x class="horizontal"
+        ><text
+          wx:for="{{dates}}"
+          wx:key="*this"
+          class="date-chip {{day === item ? 'chosen' : ''}}"
+          data-value="{{item}}"
+          bindtap="day"
+          >{{item}}</text
+        ></scroll-view
+      ><view class="timeline"
+        ><view wx:for="{{stops}}" wx:key="id" class="stop"
+          ><view class="dot"></view
+          ><view class="eyebrow"
+            >{{item.date}} · {{item.time}}
+            <text wx:if="{{item.kind !== '普通'}}"> / {{item.kind}}</text></view
+          ><view class="record-actions"
+            ><text data-id="{{item.id}}" bindtap="editStop">编辑</text
+            ><text data-id="{{item.id}}" bindtap="deleteStop">删除</text></view
+          ><view class="stop-title">{{item.name}}</view
+          ><view class="note">{{item.note}}</view
+          ><scroll-view scroll-x class="stop-photos"
+            ><image
+              wx:for="{{item.photos}}"
+              wx:for-item="url"
+              wx:key="*this"
+              src="{{url}}"
+              mode="aspectFill"
+              data-url="{{url}}"
+              data-urls="{{item.photos}}"
+              bindtap="preview" /></scroll-view></view></view
+      ><view wx:if="{{!stops.length}}" class="empty"
+        >这一天还没有记录，去留下一点回忆。</view
+      ></block
+    >
+  </block>
+  <block wx:elif="{{tab === 'map'}}">
+    <view class="heading-row"
+      ><view
+        ><view class="headline">走过的世界</view
+        ><view class="subtitle">Collect places. Keep the feeling.</view></view
+      ><text class="sun-seal">✦</text></view
+    >
+    <view class="map-shell"
+      ><map
+        id="atlas"
+        class="atlas"
+        latitude="{{scope === '中国' ? 34 : 22}}"
+        longitude="{{scope === '中国' ? 105 : 15}}"
+        scale="{{scope === '中国' ? 4 : 3}}"
+        markers="{{markers}}"
+        circles="{{circles}}"
+        enable-scroll
+        enable-zoom
+        bindmarkertap="markerTap"
+      /><view class="map-badge"
+        >{{scope === '中国' ? 'CHINA / 中国' : 'WORLD / 世界'}}
+        <text>你的足迹，慢慢亮起</text></view
+      ></view
+    >
+    <view class="map-note">地图光圈随记录数量加深 · 点击城市标记查看回忆</view>
+    <view class="stats"
+      ><view><text>{{countryCount}}</text>国家 / 地区</view
+      ><view><text>{{cityCount}}</text>城市</view
+      ><view><text>{{photoCount}}</text>照片</view></view
+    >
+    <view class="segmented"
+      ><text
+        class="{{scope === '世界' ? 'selected' : ''}}"
+        data-value="世界"
+        bindtap="scope"
+        >世界 WORLD</text
+      ><text
+        class="{{scope === '中国' ? 'selected' : ''}}"
+        data-value="中国"
+        bindtap="scope"
+        >中国 CHINA</text
+      ></view
+    >
+    <view class="section-label">RECENT MEMORIES <text>最近的旅行</text></view
+    ><view
+      wx:for="{{trips}}"
+      wx:key="id"
+      class="trip-row"
+      data-id="{{item.id}}"
+      bindtap="openTrip"
+      ><image
+        wx:if="{{item.cover}}"
+        src="{{item.cover}}"
+        mode="aspectFill"
+      /><view wx:else class="cover-blank">✦</view
+      ><view class="trip-copy"
+        ><view class="serif">{{item.city}} · {{item.country}}</view
+        ><view>{{item.date}}</view><text>{{item.title}}</text></view
+      ><text>↗</text></view
+    ><view wx:if="{{!trips.length}}" class="empty" bindtap="addTrip"
+      >世界很大，从你的第一段旅行开始。<view>＋ 记录旅行</view></view
+    >
+  </block>
+  <block wx:elif="{{tab === 'trips'}}"
+    ><view class="headline english">MY TRIPS</view
+    ><view class="subtitle">一段旅途，一卷回忆。</view
+    ><scroll-view scroll-x class="horizontal"
+      ><text
+        wx:for="{{years}}"
+        wx:key="*this"
+        class="date-chip {{year === item ? 'chosen' : ''}}"
+        data-value="{{item}}"
+        bindtap="year"
+        >{{item}}</text
+      ></scroll-view
+    ><view
+      wx:for="{{visibleTrips}}"
+      wx:key="id"
+      class="trip-row large"
+      data-id="{{item.id}}"
+      bindtap="openTrip"
+      ><image
+        wx:if="{{item.cover}}"
+        src="{{item.cover}}"
+        mode="aspectFill"
+      /><view wx:else class="cover-blank">✦</view
+      ><view class="trip-copy"
+        ><view class="serif">{{item.city}} · {{item.country}}</view
+        ><view>{{item.date}} — {{item.end}}</view
+        ><text>{{item.title}}</text></view
+      ></view
+    ><view wx:if="{{!visibleTrips.length}}" class="empty">还没有旅行记录。</view
+    ><button class="outline" bindtap="addTrip">＋ 新的一段旅程</button></block
+  >
+  <block wx:elif="{{tab === 'light'}}"
+    ><view class="eyebrow gold">THE LIGHT I'VE CHASED</view
+    ><view class="headline english">GOLDEN HOUR<text class="gold">.</text></view
+    ><view class="subtitle">日出与日落 · 收藏每一场值得的天空。</view
+    ><view class="light-summary"
+      ><view><text>{{sunrises}}</text>场日出</view
+      ><view class="sun-orbit">☼</view
+      ><view><text>{{sunsets}}</text>场日落</view></view
+    ><view class="section-tabs"
+      ><text
+        wx:for="{{filters}}"
+        wx:key="*this"
+        class="{{filter === item ? 'chosen' : ''}}"
+        data-value="{{item}}"
+        bindtap="filter"
+        >{{item}}</text
+      ></view
+    ><view class="polaroid-grid"
+      ><view
+        wx:for="{{lights}}"
+        wx:key="url"
+        class="polaroid"
+        data-url="{{item.url}}"
+        bindtap="preview"
+        ><view class="photo-wrap"
+          ><image src="{{item.url}}" mode="aspectFill" /><text
+            class="type-badge"
+            >{{item.kind === '日出' ? '☼ 日出' : '◒ 日落'}}</text
+          ></view
+        ><view class="serif">{{item.city}}</view
+        ><view class="small">{{item.date}} · {{item.time}}</view></view
+      ></view
+    ><view wx:if="{{!lights.length}}" class="empty"
+      >下一场值得的天空，等你收藏。</view
+    ><button class="outline" bindtap="addStop">＋ 记录一场光</button
+    ><view class="quote serif">追逐日出日落，也收藏当时的自己。</view></block
+  >
+  <block wx:elif="{{tab === 'souvenirs'}}"
+    ><view class="backline" data-id="mine" bindtap="nav">← 我的手账</view
+    ><view class="headline english">SOUVENIRS</view
+    ><view class="subtitle">带回一件小东西，留住一段好时光。</view
+    ><view class="cork"
+      ><view
+        wx:for="{{souvenirs}}"
+        wx:key="id"
+        class="souvenir-card"
+        data-id="{{item.id}}"
+        bindtap="viewSouvenir"
+        ><view class="pin"></view
+        ><image src="{{item.photos[0]}}" mode="aspectFill" /><view class="serif"
+          >{{item.name}}</view
+        ><view class="small">{{item.city}} · {{item.date}}</view></view
+      ><view wx:if="{{!souvenirs.length}}" class="empty"
+        >冰箱贴、票根、手写明信片……<view
+          >你的收藏柜，等着第一个故事。</view
+        ></view
+      ></view
+    ><button class="outline" bindtap="addSouvenir">
+      ＋ 从相册收藏纪念品
+    </button></block
+  >
+  <block wx:else
+    ><view class="headline english">MY ATLAS</view
+    ><view class="subtitle">把喜欢的世界，收进自己的手账。</view
+    ><view class="profile-seal">旅<text>ON THE ROAD</text></view
+    ><view class="stats"
+      ><view><text>{{trips.length}}</text>段旅行</view
+      ><view><text>{{photoCount}}</text>张回忆</view
+      ><view><text>{{souvenirs.length}}</text>件纪念品</view></view
+    ><view class="menu-row" bindtap="souvenirs"
+      ><view>我的收藏柜<text>Souvenirs from somewhere</text></view
+      ><text>↗</text></view
+    ><view class="menu-row" bindtap="exportData"
+      ><view>导出记录数据<text>JSON 备份 · 不含照片文件</text></view
+      ><text>↗</text></view
+    ><view class="privacy"
+      >这是一册保存在当前设备的私人手账。
+      尚未接入账号与云同步；清理小程序数据会丢失记录和照片。请保留原相册照片，重要记录可导出。</view
+    ><view class="quote serif">世界辽阔，幸好有迹可循。</view></block
+  >
+  <view class="footer-note">ROAM · 留下足迹，带走故事</view>
+</view>
+<view class="bottom-nav"
+  ><view
+    wx:for="{{tabs}}"
+    wx:key="id"
+    class="nav-item {{tab === item.id || (tab === 'souvenirs' && item.id === 'mine') ? 'current' : ''}} {{item.id === 'add' ? 'add-nav' : ''}}"
+    data-id="{{item.id}}"
+    bindtap="nav"
+    ><view>{{item.icon}}</view><text>{{item.label}}</text></view
+  ></view
+>
+<view wx:if="{{editor}}" class="overlay"
+  ><scroll-view scroll-y class="sheet"
+    ><view class="sheet-head"
+      ><view
+        >{{editor === 'trip' ? '收藏一段旅行' : editor === 'stop' ?
+        '留下一个片刻' : '添加纪念品'}}</view
+      ><text bindtap="closeEditor">×</text></view
+    ><view class="eyebrow">A NEW PAGE IN YOUR JOURNAL</view>
+    <view class="upload" bindtap="choosePhotos"
+      >＋ 从相册选择 / 拍摄<view>最多 9 张 · 照片将保存到小程序本地</view></view
+    ><scroll-view scroll-x class="draft-photos"
+      ><view wx:for="{{form.photos}}" wx:key="*this"
+        ><image src="{{item}}" mode="aspectFill" /><text
+          data-index="{{index}}"
+          bindtap="removePhoto"
+          >×</text
+        ></view
+      ></scroll-view
+    >
+    <block wx:if="{{editor === 'trip'}}"
+      ><view class="label">旅行名称 *</view
+      ><input
+        placeholder="例如：风吹过的大理"
+        value="{{form.title}}"
+        data-field="title"
+        bindinput="field"
+        maxlength="60"
+      /><view class="label">城市定位 *</view
+      ><picker range="{{cityOptions}}" bindchange="chooseCity"
+        ><view class="input">选择常用城市（或在下方手动填写） ▾</view></picker
+      ><view class="location-link" bindtap="chooseLocation"
+        >⌖ 在地图中选一个地点（自动填写坐标）</view
+      ><input
+        placeholder="城市名称"
+        value="{{form.city}}"
+        data-field="city"
+        bindinput="field"
+        maxlength="40"
+      /><input
+        placeholder="国家 / 地区"
+        value="{{form.country}}"
+        data-field="country"
+        bindinput="field"
+        maxlength="40"
+      /><view class="coordinates"
+        ><input
+          placeholder="纬度 -90 至 90"
+          value="{{form.latitude}}"
+          data-field="latitude"
+          bindinput="field" /><input
+          placeholder="经度 -180 至 180"
+          value="{{form.longitude}}"
+          data-field="longitude"
+          bindinput="field" /></view
+      ><view class="helper"
+        >经纬度用于点亮地图；可从地图服务查询坐标。</view
+      ></block
+    >
+    <block wx:else
+      ><view class="label"
+        >{{editor === 'souvenir' ? '纪念品名称' : '去过的地点'}} *</view
+      ><input
+        placeholder="给这份回忆起个名字"
+        value="{{form.name}}"
+        data-field="name"
+        bindinput="field"
+        maxlength="80"
+      /><view class="label">所属旅行</view
+      ><picker
+        range="{{tripNames}}"
+        value="{{form.tripIndex}}"
+        bindchange="pickTrip"
+        ><view class="input">{{tripNames[form.tripIndex]}} ▾</view></picker
+      ><view class="label"
+        >{{editor === 'stop' ? '特别的时刻' : '纪念品类别'}}</view
+      ><picker
+        range="{{editor === 'stop' ? categories : kinds}}"
+        bindchange="pickKind"
+        ><view class="input">{{form.kind}} ▾</view></picker
+      ></block
+    >
+    <view class="label">{{editor === 'trip' ? '开始日期' : '记录日期'}}</view
+    ><picker
+      mode="date"
+      value="{{form.date}}"
+      data-field="date"
+      bindchange="field"
+      ><view class="input">{{form.date}}</view></picker
+    ><block wx:if="{{editor === 'trip'}}"
+      ><view class="label">结束日期</view
+      ><picker
+        mode="date"
+        value="{{form.end}}"
+        data-field="end"
+        bindchange="field"
+        ><view class="input">{{form.end}}</view></picker
+      ></block
+    ><block wx:if="{{editor === 'stop'}}"
+      ><view class="label">当地时间</view
+      ><picker
+        mode="time"
+        value="{{form.time}}"
+        data-field="time"
+        bindchange="field"
+        ><view class="input">{{form.time}}</view></picker
+      ></block
+    ><view class="label">留一句话</view
+    ><textarea
+      placeholder="当时的风、遇见的人，或买下它的理由……"
+      value="{{form.note}}"
+      data-field="note"
+      bindinput="field"
+      maxlength="1000" /><view class="error">{{error}}</view
+    ><button
+      class="primary"
+      bindtap="save"
+      loading="{{saving}}"
+      disabled="{{saving}}"
+    >
+      {{saving ? '正在保存照片…' : '收藏这份回忆'}}</button
+    ><view class="sheet-space"></view></scroll-view
+></view>
+<view wx:if="{{souvenir}}" class="overlay"
+  ><scroll-view scroll-y class="sheet souvenir-detail"
+    ><view class="sheet-head"
+      ><text>收藏的故事</text><text bindtap="closeSouvenir">×</text></view
+    ><image
+      class="souvenir-hero"
+      src="{{souvenir.photos[0]}}"
+      mode="widthFix"
+      data-url="{{souvenir.photos[0]}}"
+      data-urls="{{souvenir.photos}}"
+      bindtap="preview"
+    /><scroll-view scroll-x class="stop-photos"
+      ><image
+        wx:for="{{souvenir.photos}}"
+        wx:key="*this"
+        src="{{item}}"
+        mode="aspectFill"
+        data-url="{{item}}"
+        data-urls="{{souvenir.photos}}"
+        bindtap="preview" /></scroll-view
+    ><view class="city-title">{{souvenir.name}}</view
+    ><view class="eyebrow"
+      >{{souvenir.city}} · {{souvenir.kind}} · {{souvenir.date}}</view
+    ><view class="poem">{{souvenir.note || '一件小物，一段旅途。'}}</view
+    ><button class="outline" bindtap="deleteSouvenir">
+      删除这件纪念品
+    </button></scroll-view
+  ></view
+>
+
+<view wx:if="{{citySheet}}" class="overlay"
+  ><scroll-view scroll-y class="sheet"
+    ><view class="sheet-head"
+      ><text>{{citySheet.name}} · 历次旅行</text
+      ><text bindtap="closeCity">×</text></view
+    ><view
+      wx:for="{{citySheet.trips}}"
+      wx:key="id"
+      class="trip-row"
+      data-id="{{item.id}}"
+      bindtap="openTrip"
+      ><image
+        wx:if="{{item.cover}}"
+        src="{{item.cover}}"
+        mode="aspectFill"
+      /><view class="trip-copy"
+        ><view class="serif">{{item.title}}</view
+        ><view>{{item.date}} — {{item.end}}</view></view
+      ><text>↗</text></view
+    ><view class="sheet-space"></view></scroll-view
+></view>

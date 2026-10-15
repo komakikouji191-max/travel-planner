@@ -1,0 +1,34 @@
+page {
+  background: #f3eddf;
+  color: #292925;
+  font-family: Arial, "PingFang SC", sans-serif;
+  font-size: 28rpx;
+}
+view,
+text,
+image,
+input,
+textarea {
+  box-sizing: border-box;
+}
+button {
+  font-size: 27rpx;
+  border-radius: 6rpx;
+}
+button::after {
+  border: 0;
+}
+button.primary {
+  background: #293c45;
+  color: #fff;
+  padding: 10rpx;
+}
+button.outline {
+  background: transparent;
+  border: 1rpx solid #b7ad99;
+  color: #44483f;
+  margin-top: 36rpx;
+}
+.serif {
+  font-family: Georgia, "Songti SC", serif;
+}

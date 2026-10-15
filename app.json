@@ -1,0 +1,22 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/preview/preview"
+  ],
+  "window": {
+    "navigationBarTitleText": "旅迹 · 私人旅行手账",
+    "navigationBarBackgroundColor": "#f3eddf",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f3eddf"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "permission": {
+    "scope.userLocation": {
+      "desc": "在你主动选择旅行地点时，用于地图选点"
+    }
+  },
+  "requiredPrivateInfos": [
+    "chooseLocation"
+  ]
+}
