@@ -313,3 +313,16 @@ test("light city and souvenir continent filters affect visible records only", ()
   p.setLightCity({ detail: { value: 1 } });
   assert.ok(p.data.lights.every((x) => x.city === p.data.lightCities[1]));
 });
+
+
+test('WXML bindings never contain split string literals',()=>{
+ const markup=fs.readFileSync('pages/index/index.wxml','utf8');
+ let count=0;
+ for(const match of markup.matchAll(/{{([\s\S]*?)}}/g)){
+  const expr=match[1].replaceAll('&amp;','&');
+  assert.ok(!/[\r\n]/.test(expr),'Multiline WXML binding: '+expr);
+  assert.doesNotThrow(()=>new vm.Script('('+expr+')'));
+  count++;
+ }
+ assert.ok(count>100);
+});

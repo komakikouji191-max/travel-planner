@@ -501,8 +501,7 @@
     class="sheet {{editor === 'souvenir' ? 'souvenir-editor-sheet' : ''}}"
     ><view class="sheet-head"
       ><view
-        >{{editor === 'trip' ? '收藏一段旅行' : editor === 'stop' ?
-        '留下一个片刻' : '添加纪念品'}}</view
+        >{{editor === 'trip' ? '收藏一段旅行' : editor === 'stop' ? '留下一个片刻' : '添加纪念品'}}</view
       ><text bindtap="closeEditor">×</text></view
     ><view wx:if="{{editor !== 'souvenir'}}" class="eyebrow"
       >A NEW PAGE IN YOUR JOURNAL</view
@@ -510,9 +509,7 @@
     <view class="upload" bindtap="choosePhotos"
       ><view wx:if="{{editor === 'souvenir'}}" class="upload-camera">◎</view
       >{{editor === 'souvenir' ? '拍照上传' : '＋ 从相册选择 / 拍摄'}}<view
-        >{{editor === 'souvenir' ?
-        '可以是实物、门票、明信片、手账，或是带有当地特色的任何东西。' : '最多 9
-        张 · 照片将保存到小程序本地'}}</view
+        >{{editor === 'souvenir' ? '可以是实物、门票、明信片、手账，或是带有当地特色的任何东西。' : '最多 9 张 · 照片将保存到小程序本地'}}</view
       ></view
     ><scroll-view scroll-x class="draft-photos"
       ><view wx:for="{{form.photos}}" wx:key="*this"
