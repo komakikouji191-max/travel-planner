@@ -2269,3 +2269,92 @@ textarea {
   height: auto;
   min-height: 820rpx;
 }
+/* Added interactions; the approved page layout is retained. */
+.paper-atlas {
+  overflow: hidden;
+}
+.atlas-wheel-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background: transparent;
+}
+.atlas-wheel-space {
+  height: 60000rpx;
+  width: 100%;
+}
+.atlas-zoom-controls {
+  position: absolute;
+  right: 20rpx;
+  bottom: 14rpx;
+  display: flex;
+  align-items: center;
+  border: 1rpx solid #bdb39c77;
+  border-radius: 30rpx;
+  background: #eee5d1cc;
+  z-index: 5;
+  color: #6e6957;
+  box-shadow: 0 2rpx 5rpx #60553c12;
+}
+.atlas-zoom-controls text {
+  padding: 9rpx 13rpx;
+  font:
+    26rpx Georgia,
+    serif;
+}
+.atlas-zoom-controls .zoom-readout {
+  font-size: 18rpx;
+  min-width: 65rpx;
+  text-align: center;
+  padding: 9rpx 2rpx;
+}
+.light-map-wrap {
+  position: relative;
+}
+.light-pin {
+  position: absolute;
+  width: 32rpx;
+  height: 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+.light-pin .city-ember {
+  width: 5rpx;
+  height: 5rpx;
+}
+.photo-pin-field {
+  font:
+    22rpx Georgia,
+    serif;
+  color: #847352;
+  padding: 24rpx 0 8rpx;
+}
+.chased-quote {
+  font-family: RoamHand, Georgia, serif;
+  letter-spacing: 1rpx;
+}
+.golden-subtitle {
+  font-family: Georgia, serif;
+  letter-spacing: 1rpx;
+}
+.atlas-word,
+.city-english,
+.trips-title,
+.light-heading,
+.golden-title,
+.souvenir-heading,
+.reference-trip-copy > view {
+  font-family: RoamDisplay, Georgia, "Times New Roman", serif;
+  font-weight: 400;
+}
+.golden-subtitle {
+  font-size: 29rpx;
+}
+.atlas-zoom-controls text {
+  font-family: Georgia, serif;
+}

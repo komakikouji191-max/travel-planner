@@ -80,13 +80,32 @@ async function addTrip(p, city = "杭州") {
 }
 test("demo data, city markers, filters and tilt", () => {
   const { p } = harness();
-  assert.equal(p.data.sunrises, 1);
-  assert.equal(p.data.sunsets, 1);
+  assert.equal(
+    p.data.sunrises,
+    p.store.trips.reduce(
+      (n, t) => n + t.stops.filter((s) => s.kind === "日出").length,
+      0,
+    ),
+  );
+  assert.equal(
+    p.data.sunsets,
+    p.store.trips.reduce(
+      (n, t) => n + t.stops.filter((s) => s.kind === "日落").length,
+      0,
+    ),
+  );
   assert.equal(p.data.markers.length, p.store.trips.length);
   p.filter({ currentTarget: { dataset: { value: "日出" } } });
   assert.equal(
     p.data.lights.length,
-    p.store.trips[0].stops.find((s) => s.kind === "日出").photos.length,
+    p.store.trips.reduce(
+      (n, t) =>
+        n +
+        t.stops
+          .filter((s) => s.kind === "日出")
+          .reduce((m, s) => m + s.photos.length, 0),
+      0,
+    ),
   );
   p.touchStart({ touches: [{ clientX: 0 }] });
   p.touchMove({ touches: [{ clientX: 400 }] });
@@ -314,15 +333,179 @@ test("light city and souvenir continent filters affect visible records only", ()
   assert.ok(p.data.lights.every((x) => x.city === p.data.lightCities[1]));
 });
 
+test("WXML bindings never contain split string literals", () => {
+  const markup = fs.readFileSync("pages/index/index.wxml", "utf8");
+  let count = 0;
+  for (const match of markup.matchAll(/{{([\s\S]*?)}}/g)) {
+    const expr = match[1].replaceAll("&amp;", "&");
+    assert.ok(!/[\r\n]/.test(expr), "Multiline WXML binding: " + expr);
+    assert.doesNotThrow(() => new vm.Script("(" + expr + ")"));
+    count++;
+  }
+  assert.ok(count > 100);
+});
 
-test('WXML bindings never contain split string literals',()=>{
- const markup=fs.readFileSync('pages/index/index.wxml','utf8');
- let count=0;
- for(const match of markup.matchAll(/{{([\s\S]*?)}}/g)){
-  const expr=match[1].replaceAll('&amp;','&');
-  assert.ok(!/[\r\n]/.test(expr),'Multiline WXML binding: '+expr);
-  assert.doesNotThrow(()=>new vm.Script('('+expr+')'));
-  count++;
- }
- assert.ok(count>100);
+test("zoom keeps the anchor fixed, clamps extremes and inverts hit coordinates", () => {
+  const G = pageRequire("../../utils/gestures");
+  let v = G.identity(),
+    anchor = [185, 140];
+  const before = G.invert(anchor, v);
+  v = G.zoomAt(v, 2, anchor);
+  assert.equal(v.zoom, 2);
+  assert.deepEqual(G.invert(anchor, v), before);
+  const q = [50, 80];
+  assert.deepEqual(G.invert(G.apply(q, v), v), q);
+  assert.equal(G.zoomAt(v, 100, anchor).zoom, 4);
+  assert.equal(G.zoomAt(v, 0.001, anchor).zoom, 0.7);
+  const { p } = harness({ demo: false, trips: [], souvenirs: [] });
+  p.atlasRect = { width: 375, height: 330, left: 0, top: 0 };
+  p.atlasWheel({ detail: { deltaY: -120 } });
+  assert.ok(p.data.atlasZoom > 100);
+  p.atlasWheel({ detail: { deltaY: 240 } });
+  assert.ok(p.data.atlasZoom < 125);
+  p.resetZoom();
+  assert.equal(p.data.atlasZoom, 100);
+  p._wheelTop = 15000;
+  p.atlasWheelScroll({ detail: { scrollTop: 14900 } });
+  assert.ok(p.data.atlasZoom > 100);
+  p.resetZoom();
+  p.atlasGestureStart({
+    touches: [
+      { x: 100, y: 100 },
+      { x: 200, y: 100 },
+    ],
+  });
+  p.atlasGestureMove({
+    touches: [
+      { x: 50, y: 100 },
+      { x: 250, y: 100 },
+    ],
+  });
+  assert.equal(p.data.atlasZoom, 200);
+  p.atlasGestureEnd({ changedTouches: [] });
+  assert.equal(p.data.atlasDragging, false);
+});
+test("every photographed light session gets its own point and uses a pin or city fallback", () => {
+  const A = pageRequire("../../utils/atlas");
+  const t = {
+    id: "trip",
+    city: "Dali",
+    country: "中国",
+    latitude: 25.6,
+    longitude: 100.2,
+    date: "2026-01-01",
+    end: "2026-02-01",
+    photos: [],
+    stops: [
+      {
+        id: "a",
+        kind: "日落",
+        date: "2026-01-02",
+        time: "18:30",
+        photos: ["a.jpg"],
+        latitude: 25.7,
+        longitude: 100.3,
+      },
+      {
+        id: "b",
+        kind: "日出",
+        date: "2026-01-03",
+        time: "06:20",
+        photos: ["b.jpg"],
+      },
+      {
+        id: "c",
+        kind: "日落",
+        date: "2026-02-01",
+        time: "18:40",
+        photos: ["c.jpg"],
+      },
+      {
+        id: "empty",
+        kind: "日出",
+        date: "2026-01-01",
+        time: "06:20",
+        photos: [],
+      },
+    ],
+  };
+  const points = A.lightFootprints({ trips: [t] }, 1);
+  assert.equal(points.length, 2);
+  assert.equal(points[0].latitude, 25.7);
+  assert.equal(points[1].latitude, 25.6);
+  assert.equal(A.lightModel({ trips: [t] }, 12).cities.length, 3);
+  assert.deepEqual(
+    points.map((p) => p.stopId),
+    ["a", "b"],
+  );
+});
+test("photo-location pin persists and is validated before saving", async () => {
+  const { p } = harness({ demo: false, trips: [], souvenirs: [] });
+  await addTrip(p);
+  p.addStop();
+  Object.assign(p.data.form, {
+    name: "Dawn by the lake",
+    kind: "日出",
+    photos: ["/tmp/dawn.jpg"],
+    latitude: "25.7",
+    longitude: "100.3",
+  });
+  await p.save();
+  const stop = p.data.active.stops[0];
+  assert.equal(stop.latitude, 25.7);
+  assert.equal(stop.longitude, 100.3);
+  p.addStop();
+  Object.assign(p.data.form, {
+    name: "Bad location",
+    latitude: "95",
+    longitude: "100",
+  });
+  await p.save();
+  assert.ok(p.data.error);
+  assert.equal(p.data.active.stops.length, 1);
+});
+test("demo enrichment is additive, idempotent and disabled for personal journals", () => {
+  const D = pageRequire("../../utils/demo");
+  const personal = { demo: false, trips: [], souvenirs: [] };
+  D.enrich(personal);
+  assert.equal(personal.trips.length, 0);
+  const t = { id: "personal-trip", city: "My city", photos: [], stops: [] };
+  const mixed = { demo: true, trips: [t], souvenirs: [{ id: "kept" }] };
+  D.enrich(mixed);
+  assert.ok(mixed.trips.length > 8);
+  assert.equal(mixed.trips[0], t);
+  assert.equal(mixed.souvenirs[0].id, "kept");
+  const count = mixed.trips.length;
+  D.enrich(mixed);
+  assert.equal(mixed.trips.length, count);
+});
+test("mouse motion changes film tilt without changing navigation or personal records", () => {
+  const { p } = harness();
+  p.openTrip(event("demo"));
+  const snapshot = JSON.stringify(p.store);
+  p.filmMouseMove({ detail: { clientX: 375 } });
+  assert.equal(p.data.tilt, 5);
+  p.filmMouseMove({ detail: { clientX: 0 } });
+  assert.equal(p.data.tilt, -5);
+  p.filmMouseLeave();
+  assert.equal(p.data.tilt, 0);
+  assert.equal(JSON.stringify(p.store), snapshot);
+  assert.equal(p.data.detail, true);
+});
+
+test("expanded preview contains at least ten countries and all bundled demo images exist", () => {
+  const { p } = harness();
+  assert.ok(p.data.countryCount >= 10);
+  assert.ok(p.data.cityCount >= 15);
+  const A = pageRequire("../../utils/atlas");
+  assert.ok(A.lightFootprints(p.store).length >= 20);
+  for (const trip of p.store.trips) {
+    for (const url of [
+      ...trip.photos,
+      ...trip.stops.flatMap((s) => s.photos),
+    ]) {
+      if (url.startsWith("/assets/"))
+        assert.ok(fs.existsSync(url.slice(1)), url);
+    }
+  }
 });

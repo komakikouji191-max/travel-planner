@@ -64,8 +64,8 @@
           ></view
         ></view
       ><view wx:if="{{!stops.length}}" class="empty" bindtap="addStop"
-        >＋ 记录这一天</view
-      ><view class="small-add" bindtap="addStop">＋ 添加去过的地方</view></view
+        >+ Add a moment</view
+      ><view class="small-add" bindtap="addStop">+ Add a place</view></view
     ><block wx:else>
       <view class="city-hero">
         <image class="hero-photo" src="{{activeCover}}" mode="aspectFill" />
@@ -117,6 +117,9 @@
             enhanced
             show-scrollbar="{{false}}"
             class="memory-scroll"
+            bindmousemove="filmMouseMove"
+            bindmouseleave="filmMouseLeave"
+            bindscroll="filmScroll"
             bindtouchstart="touchStart"
             bindtouchmove="touchMove"
             bindtouchend="touchEnd"
@@ -145,7 +148,7 @@
             ></scroll-view
           >
           <view class="city-signature">{{activeEnglish}}</view
-          ><view class="small-add" bindtap="addStop">＋ 留下新的回忆</view>
+          ><view class="small-add" bindtap="addStop">+ Add a memory</view>
         </block>
         <block wx:elif="{{detailTab === 'Itinerary'}}"
           ><scroll-view scroll-x class="horizontal"
@@ -180,7 +183,7 @@
                 ></view
               ></view
             ></view
-          ><view class="small-add" bindtap="addStop">＋ 添加足迹</view></block
+          ><view class="small-add" bindtap="addStop">+ Add a place</view></block
         >
         <block wx:else
           ><view class="notes-title">Notes from {{activeEnglish}}</view
@@ -227,6 +230,24 @@
         class="atlas-canvas"
         bindtouchend="atlasTap"
       ></canvas>
+      <scroll-view
+        class="atlas-wheel-layer"
+        scroll-y="{{!atlasDragging}}"
+        scroll-top="{{atlasWheelTop}}"
+        show-scrollbar="{{false}}"
+        bindscroll="atlasWheelScroll"
+        bindwheel="atlasWheel"
+        bindtouchstart="atlasGestureStart"
+        catchtouchmove="atlasGestureMove"
+        bindtouchend="atlasGestureEnd"
+        bindtouchcancel="atlasGestureEnd"
+        ><view class="atlas-wheel-space"></view
+      ></scroll-view>
+      <view class="atlas-zoom-controls"
+        ><text bindtap="zoomOut">−</text
+        ><text class="zoom-readout" bindtap="resetZoom">{{atlasZoom}}%</text
+        ><text bindtap="zoomIn">＋</text></view
+      >
       <view wx:if="{{scope === '中国'}}" class="china-handwriting">China</view>
       <view
         wx:for="{{atlasPoints}}"
@@ -296,7 +317,7 @@
       ></view
     >
     <view wx:if="{{demo}}" class="atlas-demo" bindtap="clearDemo"
-      >示例足迹 · 开始我的手账 ↗</view
+      >DEMO ATLAS · Start your story ↗</view
     >
   </block>
   <block wx:elif="{{tab === 'trips'}}">
@@ -329,7 +350,7 @@
       ></view
     >
     <view wx:if="{{!visibleTrips.length}}" class="empty" bindtap="addTrip"
-      >＋ 收藏第一段旅行</view
+      >+ Begin your first journey</view
     >
   </block>
   <block wx:elif="{{tab === 'light'}}">
@@ -339,15 +360,19 @@
           >✣</text
         ></view
       ><view class="light-map-wrap"
-        ><canvas
-          type="2d"
-          class="light-canvas"
-          bindtap="lightMapTap"
-        ></canvas></view
+        ><canvas type="2d" class="light-canvas" bindtap="lightMapTap"></canvas
+        ><view
+          wx:for="{{lightPoints}}"
+          wx:key="id"
+          class="light-pin"
+          style="left:{{item.x}}%;top:{{item.y}}%"
+          data-index="{{index}}"
+          catchtap="openLightPoint"
+          ><view class="city-ember"></view></view></view
       ><scroll-view scroll-x class="light-strip"
         ><image
           wx:for="{{monthLightPhotos}}"
-          wx:key="url"
+          wx:key="key"
           src="{{item.url}}"
           mode="aspectFill"
           data-url="{{item.url}}"
@@ -363,13 +388,13 @@
         block-color="#eee7d7"
         bindchange="month"
       /><view class="month-labels"
-        ><text>Jan</text><text>{{lightMonth}} 月</text><text>Dec</text></view
+        ><text>Jan</text><text>{{lightMonth}} / 12</text><text>Dec</text></view
       ><view class="chased-counts"
         ><view><text>{{sunrises}}</text>SUNRISES</view
         ><view><text>{{sunsets}}</text>SUNSETS</view
         ><view><text>{{lightCountryCount}}</text>COUNTRIES</view></view
       ><view class="chased-quote"
-        >追逐每一场日出日落，<text>也追逐更大的自己。</text></view
+        >Chasing the light,<text>finding more of myself.</text></view
       ><view
         class="light-paperplane"
         data-value="gallery"
@@ -379,14 +404,14 @@
         class="light-gallery-link"
         data-value="gallery"
         bindtap="setLightView"
-        >GOLDEN HOUR · 打开追光相册 ↗</view
+        >GOLDEN HOUR · Open the collection ↗</view
       ></block
     >
     <block wx:else
       ><view class="golden-title"
         >GOLDEN HOUR<text data-value="map" bindtap="setLightView">☼</text></view
       ><view class="golden-subtitle"
-        >日出与日落<text>收藏每一场值得的天空。</text></view
+        >Sunrise & Sunset<text>Keep every sky worth remembering.</text></view
       ><view class="golden-filters"
         ><text
           wx:for="{{lightFilters}}"
@@ -410,7 +435,7 @@
           ></view
         ></view
       ><view wx:if="{{!lights.length}}" class="empty" bindtap="addStop"
-        >＋ 收藏下一场天空</view
+        >+ Collect another sky</view
       ></block
     >
   </block>
@@ -455,21 +480,23 @@
         bindtap="addSouvenir"
         >＋ 把第一件纪念品挂在这里</view
       ></view
-    ><view class="small-add" bindtap="addSouvenir">＋ 添加纪念品</view></block
+    ><view class="small-add" bindtap="addSouvenir"
+      >+ Add a souvenir</view
+    ></block
   >
   <block wx:else
     ><view class="headline english">MY ATLAS</view
-    ><view class="subtitle">把喜欢的世界，收进自己的手账。</view
+    ><view class="subtitle">A personal atlas. A lifetime of stories.</view
     ><view class="profile-seal">旅<text>ON THE ROAD</text></view
     ><view class="stats"
       ><view><text>{{trips.length}}</text>段旅行</view
       ><view><text>{{photoCount}}</text>张回忆</view
       ><view><text>{{souvenirs.length}}</text>件纪念品</view></view
     ><view class="menu-row" bindtap="souvenirs"
-      ><view>我的收藏柜<text>Souvenirs from somewhere</text></view
+      ><view>Souvenirs<text>Souvenirs from somewhere</text></view
       ><text>↗</text></view
     ><view class="menu-row" bindtap="exportData"
-      ><view>导出记录数据<text>JSON 备份 · 不含照片文件</text></view
+      ><view>Export journal<text>JSON 备份 · 不含照片文件</text></view
       ><text>↗</text></view
     ><view class="privacy"
       >这是一册保存在当前设备的私人手账。
@@ -582,7 +609,13 @@
         ><view class="input">{{form.kind}} ▾</view></picker
       ></block
     >
-    <view class="label">{{editor === 'trip' ? '开始日期' : '记录日期'}}</view
+    <view
+      wx:if="{{editor === 'stop'}}"
+      class="photo-pin-field"
+      bindtap="chooseLocation"
+      >⌖ {{form.latitude !== undefined && form.latitude !== '' ? 'Photo location pinned' : 'Pin photo location (optional)'}}</view
+    >
+    <view class="label">{{editor === 'trip' ? 'Start date' : 'Date'}}</view
     ><picker
       mode="date"
       value="{{form.date}}"
@@ -629,7 +662,7 @@
   style="padding-top:{{safeTop}}px"
   ><view class="souvenir-detail-tools"
     ><text bindtap="closeSouvenir">‹</text
-    ><text bindtap="closeSouvenir">完成</text></view
+    ><text bindtap="closeSouvenir">Done</text></view
   ><view class="souvenir-detail-photo"
     ><image
       src="{{souvenir.photos[0]}}"
@@ -653,16 +686,18 @@
       data-urls="{{souvenir.photos}}"
       bindtap="preview" /></view
   ><view class="souvenir-data-row"
-    ><text>名称</text><view>{{souvenir.name}}</view></view
+    ><text>Name</text><view>{{souvenir.name}}</view></view
   ><view class="souvenir-data-row"
-    ><text>类别</text><view>{{souvenir.kind}}</view></view
+    ><text>Category</text><view>{{souvenir.kind}}</view></view
   ><view class="souvenir-data-row"
-    ><text>所属城市</text><view>{{souvenir.city}}</view></view
+    ><text>City</text><view>{{souvenir.city}}</view></view
   ><view class="souvenir-data-row"
-    ><text>日期</text><view>{{souvenir.date}}</view></view
+    ><text>Date</text><view>{{souvenir.date}}</view></view
   ><view class="souvenir-data-row"
-    ><text>备注</text><view>{{souvenir.note}}</view></view
-  ><view class="small-add" bindtap="deleteSouvenir">删除这件纪念品</view></view
+    ><text>Notes</text><view>{{souvenir.note}}</view></view
+  ><view class="small-add" bindtap="deleteSouvenir"
+    >Remove from collection</view
+  ></view
 >
 <view wx:if="{{citySheet}}" class="overlay"
   ><scroll-view scroll-y class="sheet"
@@ -700,6 +735,8 @@
     ><swiper-item wx:for="{{photos}}" wx:key="photoKey"
       ><view
         class="viewer-frame"
+        bindmousemove="filmMouseMove"
+        bindmouseleave="filmMouseLeave"
         style="transform:rotate({{fullPhoto ? 0 : 3 + tilt}}deg)"
         bindtouchstart="touchStart"
         bindtouchmove="touchMove"
@@ -748,7 +785,7 @@
       >{{photos[viewerIndex].date}} {{photos[viewerIndex].time}}</view
     ><view class="viewer-note">{{photos[viewerIndex].note || active.note}}</view
     ><view wx:if="{{fullPhoto}}" class="viewer-help" bindtap="fullPhoto"
-      >轻触照片返回胶卷 · 长按查看原图</view
+      >Tap to return to film · Hold to view original</view
     ></view
   >
 </view>

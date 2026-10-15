@@ -99,7 +99,7 @@ function regionFor(trip, scope) {
 function cityRecords(store) {
   const cities = new Map();
   store.trips.forEach((t) => {
-    const k = t.country + "/" + t.city;
+    const k = t.footprintId || t.country + "/" + t.city;
     let c = cities.get(k);
     if (!c) {
       c = {
@@ -162,7 +162,9 @@ function projection(m, w, h) {
   if (m.scope === "世界")
     return (p) => [
       12 + ((p[0] + 180) / 360) * (w - 24),
-      66 + ((84 - Math.max(-58, Math.min(84, p[1]))) / 142) * (h - 126),
+      (h < 240 ? 12 : 66) +
+        ((84 - Math.max(-58, Math.min(84, p[1]))) / 142) *
+          (h - (h < 240 ? 24 : 126)),
     ];
   const pts = m.features.flatMap((f) =>
     f.rings.flatMap((r) => r.map((p) => albers(...p))),
@@ -233,13 +235,17 @@ function drawPlane(ctx, x, y, angle, size) {
   ctx.fill();
   ctx.restore();
 }
-function flight(ctx, a, b, bend) {
+function flight(ctx, a, b, bend, options = {}) {
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(...a);
   const c = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2 + bend];
   ctx.quadraticCurveTo(...c, ...b);
-  ctx.strokeStyle = "#69695199";
+  ctx.strokeStyle = options.dark ? "#d6aa7299" : "#69695199";
+  if (options.dark) {
+    ctx.shadowColor = "#e6ad6c55";
+    ctx.shadowBlur = 5;
+  }
   ctx.lineWidth = 1.1;
   ctx.setLineDash([5, 6]);
   ctx.stroke();
@@ -247,13 +253,14 @@ function flight(ctx, a, b, bend) {
   const t = 0.62,
     x = (1 - t) ** 2 * a[0] + 2 * (1 - t) * t * c[0] + t * t * b[0],
     y = (1 - t) ** 2 * a[1] + 2 * (1 - t) * t * c[1] + t * t * b[1];
-  drawPlane(
-    ctx,
-    x,
-    y,
-    Math.atan2(b[1] - a[1], b[0] - a[0]) + Math.PI / 2,
-    0.65,
-  );
+  if (!options.dark)
+    drawPlane(
+      ctx,
+      x,
+      y,
+      Math.atan2(b[1] - a[1], b[0] - a[0]) + Math.PI / 2,
+      0.65,
+    );
 }
 function render(ctx, w, h, m, options = {}) {
   const project = projection(m, w, h),
@@ -320,13 +327,18 @@ function render(ctx, w, h, m, options = {}) {
     const sorted = m.cities
       .slice()
       .sort((a, b) => a.trips[0].date.localeCompare(b.trips[0].date));
-    for (let i = 1; i < sorted.length; i++)
+    for (let i = 1; i < sorted.length; i++) {
+      const a = project([sorted[i - 1].longitude, sorted[i - 1].latitude]);
+      const b = project([sorted[i].longitude, sorted[i].latitude]);
+      if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 1) continue;
       flight(
         ctx,
         project([sorted[i - 1].longitude, sorted[i - 1].latitude]),
         project([sorted[i].longitude, sorted[i].latitude]),
         -35,
+        options,
       );
+    }
   }
   const points = m.cities.map((c, index) => {
     const p = project([c.longitude, c.latitude]);
@@ -381,7 +393,83 @@ function regionSummary(m, name) {
     cityList: cities,
   };
 }
+
+function lightFootprints(store, month = 12) {
+  const points = [];
+  store.trips.forEach((t) =>
+    t.stops.forEach((s) => {
+      if (
+        !["日出", "日落"].includes(s.kind) ||
+        !s.photos.length ||
+        Number(s.date.slice(5, 7)) > month
+      )
+        return;
+      const hasPin =
+        s.latitude !== undefined &&
+        s.latitude !== null &&
+        s.longitude !== undefined &&
+        s.longitude !== null &&
+        s.latitude !== "" &&
+        s.longitude !== "" &&
+        Number.isFinite(Number(s.latitude)) &&
+        Number.isFinite(Number(s.longitude)) &&
+        Math.abs(Number(s.latitude)) <= 90 &&
+        Math.abs(Number(s.longitude)) <= 180;
+      points.push({
+        id: t.id + ":" + s.id,
+        tripId: t.id,
+        stopId: s.id,
+        name: s.name,
+        city: t.city,
+        country: t.country,
+        latitude: Number(hasPin ? s.latitude : t.latitude),
+        longitude: Number(hasPin ? s.longitude : t.longitude),
+        date: s.date,
+        time: s.time,
+        kind: s.kind,
+        photos: s.photos,
+        note: s.note,
+      });
+    }),
+  );
+  return points.sort((a, b) =>
+    (a.date + a.time).localeCompare(b.date + b.time),
+  );
+}
+function lightModel(store, month = 12) {
+  return model(
+    {
+      trips: lightFootprints(store, month).map((p) => ({
+        id: p.id,
+        footprintId: p.id,
+        sourceTripId: p.tripId,
+        sourceStopId: p.stopId,
+        city: p.city,
+        country: p.country,
+        latitude: p.latitude,
+        longitude: p.longitude,
+        date: p.date,
+        end: p.date,
+        photos: [],
+        stops: [
+          {
+            id: p.stopId,
+            kind: p.kind,
+            photos: p.photos,
+            date: p.date,
+            time: p.time,
+          },
+        ],
+      })),
+    },
+    "世界",
+    "route",
+  );
+}
+
 module.exports = {
+  lightFootprints,
+  lightModel,
   model,
   render,
   projection,

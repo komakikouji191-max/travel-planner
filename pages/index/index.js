@@ -1,4 +1,6 @@
 const Atlas = require("../../utils/atlas");
+const Gestures = require("../../utils/gestures");
+const Demo = require("../../utils/demo");
 const KEY = "roam-memory-v1";
 const filePaths = (store) =>
   new Set([
@@ -83,6 +85,13 @@ const cityEnglish = {
   成都: "Chengdu",
   曼谷: "Bangkok",
   圣托里尼: "Santorini",
+  北京: "Beijing",
+  京都: "Kyoto",
+  罗马: "Rome",
+  伊斯坦布尔: "Istanbul",
+  悉尼: "Sydney",
+  奥克兰: "Auckland",
+  旧金山: "San Francisco",
 };
 const countryEnglish = {
   中国: "China",
@@ -91,6 +100,10 @@ const countryEnglish = {
   法国: "France",
   泰国: "Thailand",
   希腊: "Greece",
+  意大利: "Italy",
+  土耳其: "Turkey",
+  澳大利亚: "Australia",
+  新西兰: "New Zealand",
 };
 const sample = () => {
   const store = baseSample();
@@ -107,18 +120,29 @@ const sample = () => {
   t.stops[1].time = "11:20";
   t.stops[2].name = "双廊";
   t.stops[2].time = "16:30";
-  t.stops.forEach(stop=>stop.kind='普通');
-  t.stops.push({id:'demo-sunrise',name:'洱海的第一缕光',date:'2026-04-14',time:'06:20',kind:'日出',note:'天光亮起的时候，山也醒了。',photos:['/assets/sunrise.jpg']},{id:'demo-sunset',name:'洱海边的日落',date:'2026-04-14',time:'18:40',kind:'日落',note:'把这一刻的金色留在这里。',photos:['/assets/sunset.jpg']});
+  t.stops.forEach((stop) => (stop.kind = "普通"));
+  t.stops.push(
+    {
+      id: "demo-sunrise",
+      name: "洱海的第一缕光",
+      date: "2026-04-14",
+      time: "06:20",
+      kind: "日出",
+      note: "天光亮起的时候，山也醒了。",
+      photos: ["/assets/sunrise.jpg"],
+    },
+    {
+      id: "demo-sunset",
+      name: "洱海边的日落",
+      date: "2026-04-14",
+      time: "18:40",
+      kind: "日落",
+      note: "把这一刻的金色留在这里。",
+      photos: ["/assets/sunset.jpg"],
+    },
+  );
   const extras = [
-    [
-      "东京",
-      "日本",
-      35.6762,
-      139.6503,
-      "2026-03-01",
-      "2026-03-08",
-      "blue-town",
-    ],
+    ["东京", "日本", 35.6762, 139.6503, "2026-03-01", "2026-03-08", "kyoto"],
     ["曼谷", "泰国", 13.7563, 100.5018, "2026-01-20", "2026-01-26", "lake"],
     [
       "圣托里尼",
@@ -127,9 +151,9 @@ const sample = () => {
       25.4615,
       "2025-10-01",
       "2025-10-08",
-      "sunset",
+      "santorini",
     ],
-    ["纽约", "美国", 40.7128, -74.006, "2025-05-10", "2025-05-20", "blue-town"],
+    ["纽约", "美国", 40.7128, -74.006, "2025-05-10", "2025-05-20", "new-york"],
   ];
   extras.forEach((a, i) =>
     store.trips.push({
@@ -189,6 +213,9 @@ Page({
     mode: "film",
     scope: "世界",
     atlasLayer: "cities",
+    atlasZoom: 100,
+    atlasDragging: false,
+    atlasWheelTop: 15000,
     detailTab: "Overview",
     timelineOnly: false,
     lightView: "map",
@@ -266,12 +293,24 @@ Page({
       this.store.trips[0].id === "demo"
     )
       this.store = sample();
+    Demo.enrich(this.store);
+    this.viewport = Gestures.identity();
+    this._wheelTop = 15000;
     this.persistedFiles = filePaths(this.store);
     this.refresh();
   },
   onReady() {
     this.pageReady = true;
     this.drawAtlas();
+    this.mouseListener = (e) => this.filmMouseMove(e);
+    if (wx.onMouseMove) wx.onMouseMove(this.mouseListener);
+  },
+  onUnload() {
+    this.pageReady = false;
+    if (this.atlasTimer) clearTimeout(this.atlasTimer);
+    if (this.filmTimer) clearTimeout(this.filmTimer);
+    if (wx.offMouseMove && this.mouseListener)
+      wx.offMouseMove(this.mouseListener);
   },
   refresh() {
     const trips = this.store.trips;
@@ -279,7 +318,13 @@ Page({
     this.activeId = active && active.id;
     const all = trips.flatMap((t) =>
       t.stops.flatMap((s) =>
-        s.photos.map((url, index) => ({ ...s, url, photoKey:s.id+'-'+index, city: t.city, tripId: t.id })),
+        s.photos.map((url, index) => ({
+          ...s,
+          url,
+          photoKey: s.id + "-" + index,
+          city: t.city,
+          tripId: t.id,
+        })),
       ),
     );
     const lights = all.filter(
@@ -321,14 +366,19 @@ Page({
     const photos = active
       ? [
           ...active.photos.map((url, index) => ({
-            url, photoKey:'cover-'+active.id+'-'+index,
+            url,
+            photoKey: "cover-" + active.id + "-" + index,
             date: active.date,
             time: "",
             name: active.title,
             kind: "普通",
           })),
           ...active.stops.flatMap((s) =>
-            s.photos.map((url,index) => ({ ...s, url, photoKey:s.id+'-'+index })),
+            s.photos.map((url, index) => ({
+              ...s,
+              url,
+              photoKey: s.id + "-" + index,
+            })),
           ),
         ]
       : [];
@@ -378,21 +428,13 @@ Page({
         ...[...new Set(trips.map((t) => t.date.slice(0, 4)))].sort().reverse(),
       ],
       active: active || null,
-      activeEnglish:
-        {
-          大理: "DALI",
-          杭州: "HANGZHOU",
-          东京: "TOKYO",
-          巴黎: "PARIS",
-          纽约: "NEW YORK",
-          成都: "CHENGDU",
-        }[active && active.city] || (active ? active.city.toUpperCase() : ""),
+      activeEnglish:active?(cityEnglish[active.city]||active.city).toUpperCase():'',
       activeProvince: active
         ? (
             Atlas.regionSummary(
               Atlas.model(this.store, "中国", "cities"),
               Atlas.regionFor(active, "中国"),
-            ).english || active.country
+            ).english || countryEnglish[active.country] || active.country
           ).toUpperCase()
         : "",
       activeCover: active
@@ -621,14 +663,24 @@ Page({
   },
   chooseLocation() {
     wx.chooseLocation({
-      success: (p) =>
-        this.setData({
-          "form.city": this.data.form.city || p.name,
+      success: (p) => {
+        const patch = {
           "form.latitude": String(p.latitude),
           "form.longitude": String(p.longitude),
-        }),
+        };
+        if (this.data.editor === "stop") {
+          if (!this.data.form.name) patch["form.name"] = p.name;
+        } else patch["form.city"] = this.data.form.city || p.name;
+        this.setData(patch);
+      },
       fail: () =>
-        wx.showToast({ title: "可手动填写城市和经纬度", icon: "none" }),
+        wx.showToast({
+          title:
+            this.data.editor === "stop"
+              ? "Using the trip city instead"
+              : "You can enter coordinates manually",
+          icon: "none",
+        }),
     });
   },
   choosePhotos() {
@@ -699,6 +751,22 @@ Page({
       if (trip.stops.some((s) => s.date < f.date || s.date > f.end))
         return fail("已有地点超出新日期范围，请先修改地点日期。");
     }
+    const hasPin =
+      (f.latitude !== undefined && f.latitude !== "") ||
+      (f.longitude !== undefined && f.longitude !== "");
+    if (
+      type === "stop" &&
+      hasPin &&
+      (!Number.isFinite(Number(f.latitude)) ||
+        !Number.isFinite(Number(f.longitude)) ||
+        f.latitude === "" ||
+        f.longitude === "" ||
+        f.latitude === undefined ||
+        f.longitude === undefined ||
+        Math.abs(Number(f.latitude)) > 90 ||
+        Math.abs(Number(f.longitude)) > 180)
+    )
+      return fail("Please choose a valid photo location.");
     if (type === "souvenir" && !f.photos.length)
       return fail("请先添加纪念品照片。");
     if (type === "stop" && f.kind !== "普通" && !f.photos.length)
@@ -755,6 +823,9 @@ Page({
           note: f.note,
           kind: f.kind,
           photos: saved,
+          ...(hasPin
+            ? { latitude: Number(f.latitude), longitude: Number(f.longitude) }
+            : {}),
         };
         const trip = this.store.trips[f.tripIndex];
         this.store.trips.forEach((t) => {
@@ -842,6 +913,9 @@ Page({
   scope(e) {
     this.setData({ scope: e.currentTarget.dataset.value });
     this.selectedRegion = null;
+    this.viewport = Gestures.identity();
+    this._wheelTop = 15000;
+    this.setData({ atlasZoom: 100 });
     this.queueAtlas();
   },
   mode(e) {
@@ -999,6 +1073,154 @@ Page({
     });
   },
 
+  scheduleAtlas() {
+    if (!this.pageReady || this.atlasTimer) return;
+    this.atlasTimer = setTimeout(() => {
+      this.atlasTimer = null;
+      this.queueAtlas();
+    }, 40);
+  },
+  zoomAtlas(factor, anchor) {
+    const r = this.atlasRect;
+    if (!r) return;
+    this.viewport = Gestures.zoomAt(
+      this.viewport || Gestures.identity(),
+      factor,
+      anchor || [r.width / 2, r.height / 2],
+    );
+    this.setData({ atlasZoom: Math.round(this.viewport.zoom * 100) });
+    this.scheduleAtlas();
+  },
+  atlasWheel(e) {
+    const d = e.detail || e;
+    const delta = Number(
+      d.deltaY !== undefined
+        ? d.deltaY
+        : d.wheelDelta !== undefined
+          ? -d.wheelDelta
+          : 0,
+    );
+    if (delta)
+      this.zoomAtlas(Math.exp(-Math.max(-240, Math.min(240, delta)) * 0.002));
+  },
+  atlasWheelScroll(e) {
+    const top = Number(e.detail.scrollTop);
+    if (!Number.isFinite(top)) return;
+    const prev = this._wheelTop;
+    this._wheelTop = top;
+    if (
+      prev === undefined ||
+      this.data.atlasDragging ||
+      Math.abs(top - prev) > 1000
+    )
+      return;
+    this.zoomAtlas(Math.exp(-(top - prev) * 0.002));
+    if (top < 1000 || top > 28000) {
+      this._wheelTop = undefined;
+      this.setData({ atlasWheelTop: 15000 });
+    }
+  },
+  zoomIn() {
+    this.zoomAtlas(1.2);
+  },
+  zoomOut() {
+    this.zoomAtlas(1 / 1.2);
+  },
+  resetZoom() {
+    this.viewport = Gestures.identity();
+    this.setData({ atlasZoom: 100 });
+    this.queueAtlas();
+  },
+  atlasTouchPoint(t) {
+    return [
+      t.x !== undefined
+        ? t.x
+        : t.clientX - (this.atlasRect ? this.atlasRect.left : 0),
+      t.y !== undefined
+        ? t.y
+        : t.clientY - (this.atlasRect ? this.atlasRect.top : 0),
+    ];
+  },
+  atlasGestureStart(e) {
+    const touches = e.touches || [];
+    if (!touches.length) return;
+    const pts = touches.map((t) => this.atlasTouchPoint(t));
+    this.atlasGesture = {
+      start: pts[0],
+      last: pts[0],
+      moved: false,
+      distance: pts.length > 1 ? Gestures.distance(pts[0], pts[1]) : null,
+    };
+    this.setData({ atlasDragging: true });
+  },
+  atlasGestureMove(e) {
+    const pts = (e.touches || []).map((t) => this.atlasTouchPoint(t));
+    const g = this.atlasGesture;
+    if (!g || !pts.length) return;
+    if (pts.length > 1) {
+      const d = Gestures.distance(pts[0], pts[1]);
+      if (g.distance && d)
+        this.zoomAtlas(d / g.distance, Gestures.midpoint(pts[0], pts[1]));
+      g.distance = d;
+      g.moved = true;
+    } else {
+      const dx = pts[0][0] - g.last[0],
+        dy = pts[0][1] - g.last[1];
+      this.viewport = Gestures.pan(
+        this.viewport || Gestures.identity(),
+        dx,
+        dy,
+      );
+      if (Gestures.distance(pts[0], g.start) > 5) g.moved = true;
+      this.scheduleAtlas();
+    }
+    g.last = pts[0];
+  },
+  atlasGestureEnd(e) {
+    const tap = this.atlasGesture && !this.atlasGesture.moved;
+    this.atlasGesture = null;
+    this.setData({ atlasDragging: false });
+    if (tap) this.atlasTap(e);
+  },
+  filmMouseMove(e) {
+    if (this.data.editor || !(this.data.detail || this.data.viewer)) return;
+    const t = e.detail || e;
+    const x = Number(t.clientX !== undefined ? t.clientX : t.x);
+    if (!Number.isFinite(x)) return;
+    const width = wx.getWindowInfo
+      ? wx.getWindowInfo().windowWidth || 375
+      : 375;
+    this.setData({ tilt: Gestures.tilt(x - width / 2, width) });
+  },
+  filmMouseLeave() {
+    this.setData({ tilt: 0 });
+  },
+  filmScroll(e) {
+    const left = Number(e.detail.scrollLeft) || 0;
+    const delta =
+      left - (this.filmScrollLeft === undefined ? left : this.filmScrollLeft);
+    this.filmScrollLeft = left;
+    if (delta) {
+      this.setData({ tilt: Math.max(-5, Math.min(5, -delta / 5)) });
+      if (this.filmTimer) clearTimeout(this.filmTimer);
+      this.filmTimer = setTimeout(() => {
+        this.filmTimer = null;
+        this.setData({ tilt: 0 });
+      }, 180);
+    }
+  },
+  openLightPoint(e) {
+    const point = (this.data.lightPoints || [])[
+      Number(e.currentTarget.dataset.index)
+    ];
+    if (!point) return;
+    this.openTrip({ currentTarget: { dataset: { id: point.tripId } } });
+    const index = this.data.photos.findIndex((p) => p.id === point.stopId);
+    this.openViewer({
+      currentTarget: { dataset: { index: Math.max(0, index) } },
+    });
+  },
+
   queueAtlas() {
     if (!this.pageReady) return;
     wx.nextTick(() => this.drawAtlas());
@@ -1030,7 +1252,28 @@ Page({
           this.data.scope,
           this.data.atlasLayer,
         );
+        const viewport = this.viewport || Gestures.identity();
+        ctx.save();
+        ctx.translate(viewport.x, viewport.y);
+        ctx.scale(viewport.zoom, viewport.zoom);
         const rendered = Atlas.render(ctx, r.width, r.height, this.atlasModel);
+        ctx.restore();
+        rendered.shapes = rendered.shapes.map((f) => ({
+          ...f,
+          rings: f.rings.map((r) => r.map((p) => Gestures.apply(p, viewport))),
+        }));
+        rendered.points = rendered.points.map((p) => {
+          const q = Gestures.apply(
+            [(p.x / 100) * r.width, (p.y / 100) * r.height],
+            viewport,
+          );
+          return {
+            ...p,
+            x: (q[0] / r.width) * 100,
+            y: (q[1] / r.height) * 100,
+          };
+        });
+
         this.atlasShapes = rendered.shapes;
         this.atlasRect = r;
         const points = rendered.points;
@@ -1054,8 +1297,14 @@ Page({
           .slice(0, 5)
           .map((p, i) => ({
             ...p,
-            x: Math.max(9, Math.min(89, p.x + (i % 2 ? 5 : -5))),
-            y: Math.max(15, Math.min(88, p.y + 10)),
+            x:
+              viewport.zoom === 1
+                ? Math.max(9, Math.min(89, p.x + (i % 2 ? 5 : -5)))
+                : p.x,
+            y:
+              viewport.zoom === 1
+                ? Math.max(15, Math.min(88, p.y + 10))
+                : p.y + 5,
             angle: i % 2 ? 5 : -5,
           }));
         this.setData({
@@ -1230,34 +1479,31 @@ Page({
         r.node.height = r.height * dpr;
         const ctx = r.node.getContext("2d");
         ctx.scale(dpr, dpr);
-        const trips = this.store.trips
-          .map((t) => ({
-            ...t,
-            stops: t.stops.filter(
-              (s) =>
-                s.kind !== "普通" &&
-                Number(s.date.slice(5, 7)) <= this.data.lightMonth,
-            ),
-          }))
-          .filter((t) => t.stops.length);
-        const store = { ...this.store, trips };
-        Atlas.render(
+        const footprints = Atlas.lightFootprints(
+          this.store,
+          this.data.lightMonth,
+        );
+        const rendered = Atlas.render(
           ctx,
           r.width,
           r.height,
-          Atlas.model(store, "世界", "route"),
+          Atlas.lightModel(this.store, this.data.lightMonth),
           { dark: true },
         );
         this.setData({
-          monthLightPhotos: trips.flatMap((t) =>
-            t.stops.flatMap((s) =>
-              s.photos.map((url) => ({
-                url,
-                date: s.date,
-                kind: s.kind,
-                city: t.city,
-              })),
-            ),
+          lightPoints: rendered.points.map((p) => ({
+            ...p,
+            tripId: p.trips[0].sourceTripId,
+            stopId: p.trips[0].sourceStopId,
+          })),
+          monthLightPhotos: footprints.flatMap((p) =>
+            p.photos.map((url, i) => ({
+              url,
+              key: p.id + "-" + i,
+              date: p.date,
+              kind: p.kind,
+              city: p.city,
+            })),
           ),
         });
       });
