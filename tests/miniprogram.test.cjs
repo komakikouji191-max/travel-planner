@@ -1,6 +1,10 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const vm = require("node:vm");
+const { createRequire } = require("node:module");
+const pageRequire = createRequire(
+  require("node:path").resolve("pages/index/index.js"),
+);
 const fs = require("node:fs");
 const code = fs.readFileSync("pages/index/index.js", "utf8");
 function harness(stored) {
@@ -33,6 +37,7 @@ function harness(stored) {
       definition = p;
     },
     wx,
+    require: pageRequire,
     console,
   });
   const p = { ...definition, data: structuredClone(definition.data) };
@@ -77,9 +82,12 @@ test("demo data, city markers, filters and tilt", () => {
   const { p } = harness();
   assert.equal(p.data.sunrises, 1);
   assert.equal(p.data.sunsets, 1);
-  assert.equal(p.data.markers.length, 1);
+  assert.equal(p.data.markers.length, p.store.trips.length);
   p.filter({ currentTarget: { dataset: { value: "日出" } } });
-  assert.equal(p.data.lights.length, 1);
+  assert.equal(
+    p.data.lights.length,
+    p.store.trips[0].stops.find((s) => s.kind === "日出").photos.length,
+  );
   p.touchStart({ touches: [{ clientX: 0 }] });
   p.touchMove({ touches: [{ clientX: 400 }] });
   assert.equal(p.data.tilt, 5);
@@ -218,4 +226,90 @@ test("city map groups repeated trips and WXML handlers exist", async () => {
   )) {
     assert.equal(typeof p[match[1]], "function", match[1]);
   }
+});
+
+test("reference navigation keeps atlas city IDs and opens dedicated Trips timeline", () => {
+  const { p } = harness();
+  p.data.atlasPoints = [{ id: "demo" }];
+  p.atlasCityTap({ currentTarget: { dataset: { index: 0 } } });
+  assert.equal(p.data.active.id, "demo");
+  assert.equal(p.data.detailTab, "Overview");
+  assert.equal(p.data.timelineOnly, false);
+  p.openItinerary(event("demo"));
+  assert.equal(p.data.timelineOnly, true);
+  assert.equal(p.data.day, p.data.active.stops[0].date);
+  assert.equal(p.data.itineraryDays.length, 7);
+  assert.ok(p.data.stops.every((s) => s.date === p.data.day));
+  p.openViewer({ currentTarget: { dataset: { index: 1 } } });
+  assert.equal(p.data.viewerIndex, 1);
+  p.fullPhoto();
+  assert.equal(p.data.fullPhoto, true);
+  p.closeViewer();
+  assert.equal(p.data.viewer, false);
+});
+test("province lookup, full-world projection and region hit-testing use geometry", () => {
+  const A = pageRequire("../../utils/atlas");
+  const china = pageRequire("../../utils/atlas-data").china;
+  const t = {
+    id: "a",
+    city: "大理",
+    country: "中国",
+    latitude: 25.6065,
+    longitude: 100.2676,
+    date: "2026-01-01",
+    end: "2026-01-02",
+    photos: [],
+    stops: [],
+  };
+  assert.equal(A.regionFor(t, "中国"), "云南省");
+  assert.equal(A.regionFor(t, "世界"), "China");
+  assert.equal(china.length, 34);
+  const m = A.model({ trips: [t] }, "中国", "provinces");
+  assert.equal(m.counts["云南省"].size, 1);
+  const projection = A.projection(m, 375, 330),
+    point = projection([t.longitude, t.latitude]);
+  assert.ok(point.every(Number.isFinite));
+  assert.ok(point[0] > 0 && point[0] < 375 && point[1] > 0 && point[1] < 330);
+  const shapes = china.map((f) => ({
+    name: f.name,
+    rings: f.rings.map((r) => r.map(projection)),
+  }));
+  assert.equal(A.hit(shapes, ...point), "云南省");
+  const world = A.model({ trips: [t] }, "世界", "cities");
+  assert.ok(world.features.length > 200);
+  assert.equal(world.days, 2);
+});
+test("country fill deepens by distinct cities, independent of repeated trips", () => {
+  const A = pageRequire("../../utils/atlas");
+  const t = {
+    id: "a",
+    city: "大理",
+    country: "中国",
+    latitude: 25.6,
+    longitude: 100.2,
+    date: "2026-01-01",
+    end: "2026-01-01",
+    photos: [],
+    stops: [],
+  };
+  const store = {
+    trips: [
+      t,
+      { ...t, id: "b" },
+      { ...t, id: "c", city: "杭州", latitude: 30.27, longitude: 120.15 },
+    ],
+  };
+  const m = A.model(store, "世界", "cities");
+  assert.equal(m.counts.China.size, 2);
+  assert.equal(m.cities.length, 2);
+});
+test("light city and souvenir continent filters affect visible records only", () => {
+  const { p } = harness();
+  p.setSouvenirFilter({ currentTarget: { dataset: { value: "Europe" } } });
+  assert.equal(p.data.visibleSouvenirs.length, 0);
+  assert.ok(p.data.souvenirs.length > 0);
+  p.setSouvenirFilter({ currentTarget: { dataset: { value: "China" } } });
+  assert.equal(p.data.visibleSouvenirs.length, p.data.souvenirs.length);
+  p.setLightCity({ detail: { value: 1 } });
+  assert.ok(p.data.lights.every((x) => x.city === p.data.lightCities[1]));
 });

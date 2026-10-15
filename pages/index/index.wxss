@@ -1,8 +1,9 @@
+@import "../../utils/typography.wxss";
+@import "../../utils/paper.wxss";
 .app {
   padding: 36rpx 36rpx 180rpx;
   min-height: 100vh;
-  background:
-    radial-gradient(ellipse at 10% 0, #fffaf077, transparent 70%), #f3eddf;
+  background-color: #ebe2cd;
 }
 .masthead {
   display: flex;
@@ -728,4 +729,1543 @@ textarea {
   color: #5d786e;
   padding: 25rpx 0 10rpx;
 }
-.design-entry{display:flex;justify-content:space-between;font-size:21rpx;color:#6f745e;background:#e8e2d3;padding:20rpx 16rpx;margin-top:18rpx;border:1rpx solid #d9cfba}
+.design-entry {
+  display: flex;
+  justify-content: space-between;
+  font-size: 21rpx;
+  color: #6f745e;
+  background: #e8e2d3;
+  padding: 20rpx 16rpx;
+  margin-top: 18rpx;
+  border: 1rpx solid #d9cfba;
+}
+/* Reference-led atlas and editorial travel journal. */
+
+.app {
+  color: #292725;
+  font-family: Georgia, "Times New Roman", "Songti SC", serif;
+  padding-bottom: 160rpx;
+}
+.app.atlas-home {
+  padding-left: 36rpx;
+  padding-right: 36rpx;
+  min-height: 100vh;
+  padding-bottom: 146rpx;
+}
+.atlas-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6rpx 0;
+}
+.atlas-word {
+  font:
+    700 116rpx/0.95 Georgia,
+    "Times New Roman",
+    serif;
+  letter-spacing: -5rpx;
+}
+.atlas-caret {
+  font-size: 38rpx;
+  margin-left: 20rpx;
+  vertical-align: middle;
+}
+.atlas-search {
+  width: 74rpx;
+  height: 74rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.search-ring {
+  width: 33rpx;
+  height: 33rpx;
+  border: 5rpx solid #272725;
+  border-radius: 50%;
+  position: relative;
+}
+.search-ring:after {
+  content: "";
+  position: absolute;
+  height: 18rpx;
+  width: 5rpx;
+  background: #272725;
+  right: -10rpx;
+  bottom: -13rpx;
+  transform: rotate(-42deg);
+}
+.atlas-script {
+  font:
+    italic 38rpx/1.2 "Brush Script MT",
+    cursive;
+  transform: rotate(-8deg);
+  margin: 50rpx 0 -30rpx 8rpx;
+  position: relative;
+  z-index: 1;
+  color: #5b5949;
+  letter-spacing: -1rpx;
+}
+.atlas-script text {
+  display: block;
+  margin: 12rpx 0 0 12rpx;
+}
+.paper-atlas {
+  position: relative;
+  height: 660rpx;
+  width: calc(100% + 72rpx);
+  margin: 0 -36rpx;
+}
+.atlas-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.atlas-city {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 38rpx;
+  height: 38rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+.city-ember {
+  height: 6rpx;
+  width: 6rpx;
+  border-radius: 50%;
+  background: #fff0b4;
+  box-shadow:
+    0 0 6rpx 3rpx #efbb6e,
+    0 0 20rpx 10rpx #d7964866;
+  animation: ember 3.6s ease-in-out infinite;
+}
+.atlas-sticker {
+  position: absolute;
+  width: 78rpx;
+  height: 88rpx;
+  padding: 3rpx;
+  background: #e7dfca;
+  box-shadow: 2rpx 5rpx 7rpx #292c3333;
+  z-index: 3;
+}
+.atlas-sticker image {
+  width: 100%;
+  height: 100%;
+}
+.atlas-totals {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  margin: 10rpx -8rpx 36rpx;
+}
+.atlas-totals > view {
+  font:
+    700 25rpx Georgia,
+    serif;
+  flex: 1;
+  color: #312f29;
+}
+.atlas-totals text {
+  display: block;
+  font:
+    700 48rpx Georgia,
+    serif;
+  letter-spacing: -2rpx;
+  margin-bottom: 10rpx;
+}
+.atlas-toggle {
+  display: flex;
+  border: 1rpx solid #d3c7ac;
+  border-radius: 60rpx;
+  background: #d9cfba55;
+  width: 440rpx;
+  margin: 0 auto;
+  padding: 6rpx;
+  box-shadow: inset 0 2rpx 3rpx #bcb49b33;
+}
+.atlas-toggle text {
+  flex: 1;
+  text-align: center;
+  font:
+    700 28rpx Georgia,
+    serif;
+  border-radius: 50rpx;
+  padding: 20rpx 0;
+  color: #625c50;
+}
+.atlas-toggle .on {
+  background: #2c2c29;
+  color: #f1e7d3;
+  box-shadow: 0 3rpx 5rpx #332c2533;
+}
+.atlas-demo {
+  font:
+    18rpx Georgia,
+    "Songti SC",
+    serif;
+  letter-spacing: 2rpx;
+  text-align: center;
+  color: #a39375;
+  margin: 20rpx 0 0;
+}
+.atlas-subnav {
+  display: flex;
+  gap: 40rpx;
+  margin: 38rpx 0 0;
+  font:
+    700 28rpx Georgia,
+    serif;
+}
+.atlas-subnav text {
+  padding-bottom: 14rpx;
+  position: relative;
+}
+.is-current:after {
+  content: "";
+  display: block;
+  width: 48rpx;
+  height: 5rpx;
+  border-radius: 3rpx;
+  background: #3a3c34;
+  margin-top: 10rpx;
+}
+.china-atlas {
+  height: 640rpx;
+  margin-top: -15rpx;
+}
+.china-handwriting {
+  position: absolute;
+  right: 105rpx;
+  top: 20rpx;
+  font:
+    italic 54rpx "Brush Script MT",
+    cursive;
+  color: #6c705d;
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+.atlas-callout {
+  position: absolute;
+  transform: translate(14rpx, -105%);
+  padding: 16rpx 25rpx;
+  background: #292c2e;
+  color: #eee7d5;
+  border-radius: 6rpx;
+  z-index: 4;
+  box-shadow: 0 6rpx 15rpx #1d2d3433;
+  white-space: nowrap;
+}
+.atlas-callout view {
+  font-size: 31rpx;
+}
+.atlas-callout text {
+  font-size: 23rpx;
+  display: block;
+  margin-top: 6rpx;
+  color: #c4bfb2;
+}
+.atlas-callout:after {
+  content: "";
+  position: absolute;
+  bottom: -12rpx;
+  left: 18rpx;
+  border-left: 12rpx solid transparent;
+  border-right: 12rpx solid transparent;
+  border-top: 13rpx solid #292c2e;
+}
+.province-paper {
+  padding: 18rpx 0 24rpx;
+  border-top: 1rpx solid #d4c8af;
+}
+.province-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font:
+    700 37rpx Georgia,
+    "Songti SC",
+    serif;
+}
+.province-heading > text {
+  font-size: 40rpx;
+}
+.province-meta {
+  font:
+    27rpx Georgia,
+    serif;
+  margin: 12rpx 0 20rpx;
+}
+.province-photos {
+  display: flex;
+  gap: 8rpx;
+  height: 160rpx;
+  overflow: hidden;
+}
+.province-photos image {
+  width: calc(25% - 6rpx);
+  height: 160rpx;
+  flex-shrink: 0;
+  border: 3rpx solid #c7c1b1;
+  border-radius: 6rpx;
+}
+.province-empty {
+  font-size: 25rpx;
+  color: #8d7d5f;
+  padding: 20rpx 0;
+}
+.bottom-nav {
+  background: #ebe3d0f5;
+  border-top: 1rpx solid #ccc1aa;
+  padding-top: 19rpx;
+  padding-bottom: calc(18rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -7rpx 25rpx #89775b08;
+}
+.nav-item {
+  font-family: Georgia, serif;
+  color: #514e42;
+  opacity: 0.6;
+}
+.nav-item.current {
+  color: #282927;
+  opacity: 1;
+}
+.nav-drawing {
+  display: block;
+  width: 43rpx;
+  height: 43rpx;
+  margin: 0 auto 10rpx;
+}
+.nav-item > text {
+  font:
+    700 21rpx Georgia,
+    serif;
+}
+.add-nav {
+  opacity: 1;
+}
+.add-nav > view {
+  width: 86rpx;
+  height: 86rpx;
+  background: #2b2d2b;
+  color: #e9e0cb;
+  border: 1rpx solid #6a6659;
+  box-shadow: 0 0 0 6rpx #e2d9c5;
+  margin: -22rpx auto 0;
+  line-height: 78rpx;
+  font:
+    50rpx/78rpx Georgia,
+    serif;
+}
+.add-nav > text {
+  display: none;
+}
+.city-page {
+  padding: 0 0 0 !important;
+  min-height: 100vh;
+}
+.city-hero {
+  position: relative;
+  height: 850rpx;
+  background: #252727;
+  color: #f1e7d6;
+  overflow: hidden;
+}
+.hero-photo {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+.hero-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    #14213516 20%,
+    #24272b2b 35%,
+    #24262bcf 75%,
+    #24262b 100%
+  );
+}
+.city-tools {
+  position: absolute;
+  left: 34rpx;
+  right: 36rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 66rpx;
+  z-index: 1;
+}
+.city-tools > view {
+  display: flex;
+  gap: 32rpx;
+  align-items: center;
+  font:
+    48rpx Georgia,
+    serif;
+}
+.city-tools > view > text:last-child {
+  font-size: 37rpx;
+  letter-spacing: 3rpx;
+}
+.city-heading {
+  position: absolute;
+  left: 40rpx;
+  top: 295rpx;
+}
+.city-english {
+  font:
+    700 97rpx/1 Georgia,
+    serif;
+  letter-spacing: -3rpx;
+}
+.city-location {
+  font:
+    30rpx Georgia,
+    "Songti SC",
+    serif;
+  margin-top: 20rpx;
+}
+.city-dates {
+  font:
+    24rpx Georgia,
+    serif;
+  margin-top: 20rpx;
+  color: #d3ccc2;
+}
+.city-verse {
+  position: absolute;
+  left: 40rpx;
+  bottom: 90rpx;
+  right: 125rpx;
+  white-space: pre-wrap;
+  font:
+    30rpx/1.9 "Songti SC",
+    serif;
+  letter-spacing: 3rpx;
+}
+.postmark {
+  position: absolute;
+  right: 28rpx;
+  bottom: 82rpx;
+  border: 2rpx solid #d3c6a86b;
+  width: 100rpx;
+  height: 100rpx;
+  transform: rotate(-17deg);
+  border-radius: 50%;
+  text-align: center;
+  padding-top: 26rpx;
+  font:
+    20rpx Georgia,
+    serif;
+  opacity: 0.6;
+}
+.postmark text {
+  display: block;
+  font-size: 11rpx;
+  margin-top: 8rpx;
+}
+.city-paper {
+  position: relative;
+  margin-top: -28rpx;
+  border-radius: 26rpx 26rpx 0 0;
+  min-height: 500rpx;
+  padding: 0 32rpx 45rpx;
+}
+.city-tabs {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1rpx solid #cfc1a6;
+}
+.city-tabs text {
+  font:
+    700 25rpx Georgia,
+    serif;
+  padding: 28rpx 0 20rpx;
+  color: #7b7567;
+}
+.city-tabs .active-tab {
+  color: #272a28;
+  border-bottom: 3rpx solid #635b48;
+}
+.city-stats {
+  display: flex;
+  text-align: center;
+  padding: 26rpx 0 34rpx;
+}
+.city-stats > view {
+  flex: 1;
+  font:
+    700 22rpx Georgia,
+    serif;
+  color: #6c6454;
+}
+.city-stats text {
+  display: block;
+  font:
+    700 48rpx Georgia,
+    serif;
+  color: #302f29;
+  margin-bottom: 12rpx;
+}
+.memory-title {
+  font:
+    700 26rpx Georgia,
+    serif;
+  margin: 10rpx 0 20rpx;
+}
+.memory-title text {
+  float: right;
+  font:
+    19rpx Georgia,
+    serif;
+  color: #8d7c5c;
+  padding-top: 6rpx;
+}
+.memory-scroll {
+  width: calc(100% + 64rpx);
+  margin: 0 -32rpx;
+  white-space: nowrap;
+  padding: 26rpx 0 45rpx;
+}
+.memory-reel {
+  display: inline-flex;
+  min-width: 100%;
+  transform-origin: center;
+  transition: transform 0.24s ease-out;
+  padding-left: 22rpx;
+}
+.memory-frame {
+  background: #232724;
+  border-top: 15rpx dashed #e0d6bc;
+  border-bottom: 15rpx dashed #e0d6bc;
+  padding: 7rpx 9rpx;
+  width: 255rpx;
+  flex-shrink: 0;
+  box-shadow: 0 8rpx 12rpx #39372e22;
+}
+.memory-frame image {
+  width: 237rpx;
+  height: 220rpx;
+  display: block;
+}
+.reel-number {
+  font:
+    12rpx Georgia,
+    serif;
+  letter-spacing: 2rpx;
+  color: #c6ad7a;
+  padding: 4rpx;
+}
+.reel-number text {
+  float: right;
+}
+.memory-empty {
+  background: #292b27;
+  padding: 80rpx 100rpx;
+  color: #d8c9a8;
+  font:
+    25rpx Georgia,
+    serif;
+}
+.city-signature {
+  font:
+    italic 66rpx/1.3 "Brush Script MT",
+    cursive;
+  text-align: right;
+  transform: rotate(-12deg);
+  color: #8c856c;
+  margin: 10rpx 25rpx 20rpx;
+}
+.small-add {
+  font:
+    23rpx Georgia,
+    "Songti SC",
+    serif;
+  color: #8d7c5c;
+  text-align: center;
+  letter-spacing: 1rpx;
+  padding: 25rpx 0;
+}
+.notes-title {
+  font:
+    italic 35rpx Georgia,
+    serif;
+  padding: 45rpx 0 20rpx;
+}
+.journal-note {
+  font:
+    30rpx/2.2 "Songti SC",
+    serif;
+  white-space: pre-wrap;
+  color: #6d6250;
+  padding-bottom: 50rpx;
+}
+.photo-viewer {
+  position: fixed;
+  inset: 0;
+  background: #252326;
+  color: #eee2d0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.viewer-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 36rpx 28rpx;
+  font:
+    31rpx Georgia,
+    serif;
+  flex-shrink: 0;
+}
+.viewer-toolbar > text {
+  font-size: 60rpx;
+  line-height: 1;
+}
+.viewer-toolbar > text:last-child {
+  font-size: 35rpx;
+  letter-spacing: 4rpx;
+}
+.viewer-stage {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  background: radial-gradient(ellipse at center, #6a5c4c99, #292629 75%);
+  padding: 40rpx 0;
+  box-sizing: border-box;
+}
+.viewer-frame {
+  position: relative;
+  margin: 35rpx 22rpx 0;
+  border-left: 19rpx dashed #b8ad98;
+  border-right: 19rpx dashed #b8ad98;
+  background: #1e2020;
+  height: calc(100% - 80rpx);
+  padding: 0 5rpx;
+  transition: transform 0.22s ease-out;
+  box-shadow: 0 10rpx 25rpx #0006;
+}
+.viewer-film-label {
+  height: 36rpx;
+  font:
+    17rpx/36rpx Georgia,
+    serif;
+  letter-spacing: 2rpx;
+  color: #c5a579;
+  padding: 0 8rpx;
+}
+.viewer-film-label text {
+  float: right;
+}
+.viewer-photo {
+  width: 100%;
+  height: calc(100% - 72rpx);
+  display: block;
+}
+.viewer-thumbs {
+  white-space: nowrap;
+  padding: 15rpx 26rpx 0;
+  box-sizing: border-box;
+  height: 135rpx;
+  flex-shrink: 0;
+}
+.viewer-thumbs image {
+  width: 103rpx;
+  height: 100rpx;
+  display: inline-block;
+  margin-right: 10rpx;
+  opacity: 0.5;
+  border: 2rpx solid transparent;
+}
+.viewer-thumbs .thumb-active {
+  opacity: 1;
+  border-color: #c7b087;
+}
+.viewer-info {
+  padding: 18rpx 34rpx calc(30rpx + env(safe-area-inset-bottom));
+  flex-shrink: 0;
+}
+.viewer-location {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font:
+    27rpx Georgia,
+    "Songti SC",
+    serif;
+}
+.viewer-location > view:last-child {
+  display: flex;
+  gap: 35rpx;
+  font-size: 42rpx;
+}
+.viewer-date {
+  font:
+    23rpx Georgia,
+    serif;
+  color: #b9ada0;
+  margin-top: 8rpx;
+}
+.viewer-note {
+  font:
+    27rpx/1.8 "Songti SC",
+    serif;
+  white-space: pre-wrap;
+  color: #c8bcac;
+  margin-top: 12rpx;
+  max-height: 110rpx;
+  overflow: hidden;
+}
+.immersive .viewer-stage {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  background: #181819;
+  padding: 0;
+}
+.immersive .viewer-toolbar {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(#0006, transparent);
+}
+.immersive .viewer-frame {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+.immersive .viewer-photo {
+  height: 100%;
+  width: 100%;
+}
+.immersive .viewer-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, #181819dd);
+  padding-top: 120rpx;
+  z-index: 2;
+}
+.viewer-help {
+  font:
+    18rpx Georgia,
+    "Songti SC",
+    serif;
+  color: #b0a28c;
+  margin-top: 16rpx;
+}
+.trips-page {
+  padding-left: 38rpx;
+  padding-right: 38rpx;
+}
+.trips-title {
+  font:
+    700 80rpx/1.1 Georgia,
+    serif;
+  letter-spacing: -3rpx;
+  margin: 16rpx 0 45rpx;
+}
+.trip-years {
+  white-space: nowrap;
+  margin-bottom: 20rpx;
+}
+.trip-years text {
+  display: inline-block;
+  margin-right: 36rpx;
+  padding: 18rpx 0;
+  font:
+    700 italic 33rpx Georgia,
+    serif;
+  color: #77715e;
+}
+.trip-years .selected-year {
+  color: #282a25;
+  border-bottom: 4rpx solid #383c32;
+}
+.reference-trip {
+  display: flex;
+  gap: 28rpx;
+  margin: 30rpx 0 32rpx;
+  align-items: center;
+}
+.reference-trip > image,
+.trip-placeholder {
+  width: 236rpx;
+  height: 202rpx;
+  flex-shrink: 0;
+  border-radius: 7rpx;
+  border: 3rpx solid #c7c4b6;
+  box-shadow: 1rpx 4rpx 5rpx #665e4633;
+}
+.trip-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8b7b5f;
+  background: #d8ceb9;
+}
+.reference-trip-copy {
+  min-width: 0;
+}
+.reference-trip-copy > view {
+  font:
+    700 34rpx/1.2 Georgia,
+    serif;
+  letter-spacing: -1rpx;
+  margin-bottom: 17rpx;
+}
+.reference-trip-copy > text {
+  display: block;
+  font:
+    25rpx Georgia,
+    serif;
+  color: #7d7461;
+  margin: 11rpx 0;
+  letter-spacing: -0.5rpx;
+}
+.diary-page {
+  min-height: 100vh;
+  padding: 0 32rpx 45rpx;
+}
+.diary-heading {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin-bottom: 32rpx;
+}
+.diary-heading > text:first-child {
+  font-size: 65rpx;
+  line-height: 1;
+}
+.diary-heading > text:last-child {
+  font-size: 37rpx;
+  letter-spacing: 3rpx;
+  margin-left: auto;
+}
+.diary-heading > view > view {
+  font:
+    700 37rpx Georgia,
+    "Songti SC",
+    serif;
+}
+.diary-heading > view > text {
+  display: block;
+  font:
+    25rpx Georgia,
+    serif;
+  color: #7d725e;
+  margin-top: 11rpx;
+}
+.diary-days {
+  white-space: nowrap;
+  margin: 30rpx 0 45rpx;
+}
+.diary-days > view {
+  display: inline-block;
+  text-align: center;
+  margin-right: 34rpx;
+  padding: 18rpx 0;
+  font:
+    700 24rpx Georgia,
+    serif;
+  color: #8b826c;
+}
+.diary-days text {
+  display: block;
+  margin: 0 0 9rpx;
+}
+.diary-days .selected-day {
+  color: #2e322c;
+  border-bottom: 4rpx solid #434636;
+}
+.diary-line {
+  margin-left: 10rpx;
+  border-left: 3rpx solid #555b4a;
+  padding-left: 33rpx;
+}
+.diary-stop {
+  display: flex;
+  gap: 24rpx;
+  position: relative;
+  padding-bottom: 44rpx;
+  min-height: 270rpx;
+}
+.diary-node {
+  position: absolute;
+  left: -45rpx;
+  top: 3rpx;
+  width: 20rpx;
+  height: 20rpx;
+  border: 5rpx solid #4b5143;
+  border-radius: 50%;
+  background: #ede4d0;
+  box-shadow: 0 0 0 5rpx #ebe2cd;
+}
+.diary-time {
+  width: 110rpx;
+  flex-shrink: 0;
+  font:
+    700 28rpx Georgia,
+    serif;
+}
+.diary-time > image {
+  width: 85rpx;
+  height: 150rpx;
+  margin: 30rpx 0 0 7rpx;
+  border-radius: 5rpx;
+  border: 2rpx solid #c0bca9;
+}
+.diary-content {
+  flex: 1;
+  min-width: 0;
+}
+.diary-name {
+  font:
+    700 28rpx "Songti SC",
+    serif;
+  margin-bottom: 10rpx;
+}
+.diary-description {
+  font:
+    25rpx/1.65 "Songti SC",
+    serif;
+  color: #7b715b;
+}
+.diary-gallery {
+  display: flex;
+  gap: 8rpx;
+  margin-top: 13rpx;
+}
+.diary-gallery image,
+.diary-overflow {
+  width: 125rpx;
+  height: 110rpx;
+  border: 2rpx solid #b8b5a4;
+  border-radius: 6rpx;
+  flex-shrink: 0;
+}
+.diary-overflow {
+  background: #48453d;
+  color: #e9dfcb;
+  font:
+    28rpx/110rpx Georgia,
+    serif;
+  text-align: center;
+}
+.light-map-page {
+  background-color: #27282b;
+  background-image: none;
+  padding-left: 34rpx;
+  padding-right: 34rpx;
+}
+.light-heading {
+  font:
+    700 33rpx Georgia,
+    serif;
+  letter-spacing: -1rpx;
+  color: #ede4d2;
+  margin: 20rpx 0 25rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.light-heading text {
+  font:
+    40rpx Georgia,
+    serif;
+  color: #b0a58f;
+}
+.light-map-wrap {
+  height: 360rpx;
+  width: calc(100% + 68rpx);
+  margin: 0 -34rpx;
+}
+.light-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.light-strip {
+  white-space: nowrap;
+  height: 125rpx;
+  margin-top: 15rpx;
+}
+.light-strip image {
+  display: inline-block;
+  width: 115rpx;
+  height: 100rpx;
+  margin-right: 14rpx;
+  border: 3rpx solid #716a5e;
+  border-radius: 5rpx;
+}
+.light-slider {
+  margin: 22rpx 0 0;
+}
+.month-labels {
+  display: flex;
+  justify-content: space-between;
+  font:
+    18rpx Georgia,
+    serif;
+  color: #a4967e;
+  margin-top: -8rpx;
+}
+.chased-counts {
+  display: flex;
+  text-align: center;
+  margin: 55rpx 0 45rpx;
+}
+.chased-counts > view {
+  flex: 1;
+  font:
+    20rpx Georgia,
+    serif;
+  color: #c4b8a3;
+}
+.chased-counts text {
+  display: block;
+  font:
+    65rpx Georgia,
+    serif;
+  margin-bottom: 10rpx;
+  color: #ede4d1;
+}
+.chased-quote {
+  font:
+    33rpx/2.2 "Songti SC",
+    serif;
+  letter-spacing: 5rpx;
+  color: #dfd5c0;
+  margin: 65rpx 0 0 5rpx;
+}
+.chased-quote text {
+  display: block;
+}
+.light-paperplane {
+  text-align: right;
+  font-size: 62rpx;
+  transform: rotate(-28deg);
+  color: #8c867a;
+  margin: 10rpx 35rpx 25rpx;
+}
+.light-gallery-link {
+  text-align: center;
+  font:
+    20rpx Georgia,
+    serif;
+  letter-spacing: 2rpx;
+  color: #b1a286;
+  margin-top: 25rpx;
+}
+.golden-title {
+  font:
+    700 57rpx/1.1 Georgia,
+    serif;
+  letter-spacing: -3rpx;
+  margin: 18rpx 0 36rpx;
+  white-space: nowrap;
+}
+.golden-title > text {
+  float: right;
+  font:
+    40rpx Georgia,
+    serif;
+  letter-spacing: 0;
+}
+.golden-subtitle {
+  font:
+    700 31rpx/1.8 "Songti SC",
+    serif;
+  letter-spacing: 4rpx;
+  margin-bottom: 30rpx;
+}
+.golden-subtitle text {
+  display: block;
+}
+.golden-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font:
+    700 27rpx Georgia,
+    serif;
+  margin-bottom: 30rpx;
+  padding: 15rpx 0;
+}
+.golden-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20rpx;
+}
+.golden-card {
+  width: calc(50% - 10rpx);
+  background: #e5dcc8;
+  box-shadow: 0 5rpx 7rpx #96856b1a;
+  margin-bottom: 12rpx;
+  border-radius: 8rpx 8rpx 0 0;
+  overflow: hidden;
+}
+.golden-photo {
+  height: 305rpx;
+  position: relative;
+}
+.golden-photo image {
+  width: 100%;
+  height: 100%;
+  border: 3rpx solid #c2bba9;
+  border-radius: 8rpx;
+}
+.golden-photo > text {
+  position: absolute;
+  left: 14rpx;
+  top: 14rpx;
+  background: #eee6d0cf;
+  border-radius: 50%;
+  color: #9b8156;
+  font-size: 28rpx;
+  width: 38rpx;
+  height: 38rpx;
+  text-align: center;
+  line-height: 38rpx;
+}
+.golden-caption {
+  padding: 15rpx 12rpx 20rpx;
+}
+.golden-caption > view {
+  font:
+    700 29rpx Georgia,
+    serif;
+  margin-bottom: 12rpx;
+}
+.golden-caption > text {
+  font:
+    21rpx Georgia,
+    serif;
+  color: #85745a;
+}
+.souvenir-heading {
+  font:
+    700 57rpx Georgia,
+    serif;
+  letter-spacing: -3rpx;
+  margin: 15rpx 0 14rpx;
+}
+.souvenir-heading text {
+  float: right;
+  font:
+    37rpx Georgia,
+    serif;
+}
+.souvenir-subtitle {
+  font:
+    23rpx/1.5 "Courier New",
+    monospace;
+  color: #84745c;
+}
+.souvenir-subtitle text {
+  display: block;
+}
+.souvenir-filters {
+  display: flex;
+  justify-content: space-between;
+  font:
+    700 22rpx Georgia,
+    serif;
+  margin: 30rpx 0 20rpx;
+}
+.souvenir-board {
+  height: 820rpx;
+  position: relative;
+  margin: 0 -8rpx;
+  border: 10rpx solid #897450;
+  box-shadow:
+    inset 0 0 20rpx #3b271d66,
+    4rpx 12rpx 15rpx #56452d44;
+  overflow: hidden;
+}
+.cork-backing {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.board-string {
+  position: absolute;
+  top: 42rpx;
+  left: 35rpx;
+  right: 30rpx;
+  height: 23rpx;
+  border-bottom: 4rpx solid #4e4231;
+  border-radius: 50%;
+  transform: rotate(1deg);
+  box-shadow: 0 3rpx 3rpx #0002;
+}
+.hanging-piece {
+  position: absolute;
+  width: 200rpx;
+  padding: 12rpx 12rpx 30rpx;
+  background: #eee3cd;
+  box-shadow: 3rpx 9rpx 10rpx #3e2e2555;
+  transform: rotate(-6deg);
+}
+.hanging-piece > image {
+  width: 100%;
+  height: 170rpx;
+}
+.piece-label {
+  font:
+    21rpx Georgia,
+    "Songti SC",
+    serif;
+  margin-top: 12rpx;
+  color: #4d493d;
+}
+.piece-label > text {
+  display: block;
+  font-size: 16rpx;
+  color: #948062;
+  margin-top: 5rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.piece-clip {
+  position: absolute;
+  top: -12rpx;
+  left: 48%;
+  width: 11rpx;
+  height: 33rpx;
+  border-radius: 3rpx;
+  background: linear-gradient(90deg, #54473a, #b3a184, #695641);
+  box-shadow: 3rpx 3rpx 3rpx #30251c44;
+  z-index: 2;
+}
+.hanging-thread {
+  position: absolute;
+  top: -100rpx;
+  left: 50%;
+  height: 100rpx;
+  width: 2rpx;
+  background: #61503a;
+}
+.piece-0 {
+  left: 25rpx;
+  top: 105rpx;
+}
+.piece-1 {
+  right: 22rpx;
+  top: 160rpx;
+  transform: rotate(7deg);
+}
+.piece-2 {
+  left: 60rpx;
+  top: 445rpx;
+  transform: rotate(4deg);
+}
+.piece-3 {
+  right: 20rpx;
+  top: 475rpx;
+  transform: rotate(-4deg);
+}
+.piece-4 {
+  left: 225rpx;
+  top: 230rpx;
+  transform: rotate(3deg);
+}
+.piece-5 {
+  left: 20rpx;
+  top: 650rpx;
+  transform: rotate(-8deg);
+}
+.cutout-piece {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+  width: 180rpx;
+}
+.cutout-piece > image {
+  height: 280rpx;
+}
+.cutout-piece .piece-label {
+  display: none;
+}
+.cutout-piece .piece-clip {
+  display: none;
+}
+.board-tag {
+  position: absolute;
+  left: 244rpx;
+  top: 80rpx;
+  padding: 25rpx 15rpx 20rpx;
+  background: #c1a77f;
+  color: #4e402b;
+  font:
+    700 24rpx Georgia,
+    serif;
+  transform: rotate(5deg);
+  box-shadow: 4rpx 7rpx 8rpx #48321e44;
+}
+.board-tag > view {
+  font-size: 30rpx;
+  margin-bottom: 10rpx;
+}
+.board-note {
+  position: absolute;
+  right: 20rpx;
+  bottom: 25rpx;
+  background: #d7c29d;
+  color: #6b5132;
+  font:
+    26rpx/1.7 "Songti SC",
+    serif;
+  padding: 30rpx 20rpx;
+  transform: rotate(-7deg);
+  box-shadow: 4rpx 6rpx 8rpx #3d2a1e55;
+}
+.board-note text {
+  display: block;
+}
+.board-empty {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 300rpx;
+  text-align: center;
+  font-size: 25rpx;
+  color: #f3e8cf;
+}
+.souvenir-detail-page {
+  position: fixed;
+  inset: 0;
+  overflow: auto;
+  z-index: 25;
+  background: #ebe2cd;
+  padding: 0 32rpx 60rpx;
+}
+.souvenir-detail-tools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 28rpx;
+}
+.souvenir-detail-tools > text:first-child {
+  font-size: 65rpx;
+  line-height: 1;
+}
+.souvenir-detail-tools > text:last-child {
+  font-size: 24rpx;
+  border-radius: 45rpx;
+  background: #302e2b;
+  color: #eee6d4;
+  padding: 12rpx 28rpx;
+}
+.souvenir-detail-photo {
+  height: 590rpx;
+  position: relative;
+  border-radius: 12rpx;
+  overflow: hidden;
+  background: #d0c7b4;
+}
+.souvenir-detail-photo > image {
+  width: 100%;
+  height: 100%;
+}
+.souvenir-detail-photo > text {
+  position: absolute;
+  top: 15rpx;
+  left: 15rpx;
+  border: 1rpx solid #e5d8be;
+  border-radius: 25rpx;
+  background: #333b3b88;
+  padding: 9rpx 16rpx;
+  color: #ede3cf;
+  font-size: 20rpx;
+}
+.souvenir-thumbnails {
+  display: flex;
+  gap: 12rpx;
+  margin: 16rpx 0 32rpx;
+}
+.souvenir-thumbnails > image {
+  width: 110rpx;
+  height: 110rpx;
+  border: 2rpx solid #aca28b;
+  border-radius: 5rpx;
+}
+.souvenir-data-row {
+  display: flex;
+  gap: 24rpx;
+  border-bottom: 1rpx solid #cfc3aa;
+  padding: 22rpx 0;
+  font:
+    26rpx/1.7 "Songti SC",
+    serif;
+}
+.souvenir-data-row > text {
+  font-weight: bold;
+  width: 145rpx;
+  flex-shrink: 0;
+}
+.souvenir-data-row > view {
+  flex: 1;
+  color: #635b49;
+}
+.souvenir-editor {
+  background: #ebe2cd;
+  align-items: stretch;
+}
+.souvenir-editor-sheet {
+  max-height: 100vh;
+  border-radius: 0;
+  padding-top: 110rpx;
+}
+.souvenir-editor-sheet .sheet-head {
+  justify-content: center;
+  position: relative;
+  font:
+    700 30rpx "Songti SC",
+    serif;
+}
+.souvenir-editor-sheet .sheet-head > text {
+  position: absolute;
+  left: 0;
+  top: -10rpx;
+  font-size: 0;
+}
+.souvenir-editor-sheet .sheet-head > text:before {
+  content: "‹";
+  font:
+    60rpx Georgia,
+    serif;
+  color: #3a3c33;
+}
+.souvenir-editor-sheet .upload {
+  height: 340rpx;
+  border: 2rpx solid #c7bba2;
+  border-radius: 12rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 30rpx;
+  font-weight: bold;
+  margin-bottom: 30rpx;
+}
+.souvenir-editor-sheet .label {
+  margin: 20rpx 0 6rpx;
+  font:
+    700 25rpx "Songti SC",
+    serif;
+}
+.souvenir-editor-sheet input,
+.souvenir-editor-sheet .input,
+.souvenir-editor-sheet textarea {
+  background: transparent;
+  border: 0;
+  border-bottom: 1rpx solid #c9bca1;
+  border-radius: 0;
+  padding: 14rpx 0;
+  font-size: 25rpx;
+  min-height: 60rpx;
+  margin: 0;
+  color: #7c6e55;
+}
+.souvenir-editor-sheet textarea {
+  height: 100rpx;
+}
+.souvenir-editor-sheet button.primary {
+  margin-top: 65rpx;
+  border-radius: 60rpx;
+  background: #2d2d2a;
+  padding: 12rpx;
+}
+.souvenir-editor-sheet .helper {
+  display: none;
+}
+@keyframes ember {
+  50% {
+    opacity: 0.45;
+    box-shadow:
+      0 0 12rpx 5rpx #efbb6e,
+      0 0 28rpx 13rpx #d7964833;
+  }
+}
+.upload-camera {
+  font-size: 72rpx !important;
+  color: #35392f !important;
+  line-height: 1;
+  margin: 0 0 18rpx !important;
+}
+.souvenir-editor-sheet .upload > view:last-child {
+  font:
+    23rpx/1.7 "Songti SC",
+    serif;
+  max-width: 530rpx;
+  margin: 22rpx auto 0;
+  font-weight: normal;
+}
+.trip-years,
+.diary-days {
+  width: 100%;
+  overflow: hidden;
+}
+.app {
+  overflow-x: hidden;
+}
+.light-map-page .nav-drawing {
+  filter: brightness(1.7);
+}
+.city-signature {
+  font-size: 90rpx;
+  line-height: 0.8;
+  margin-top: 30rpx;
+}
+.atlas-script {
+  font-family: RoamHand, "Brush Script MT", cursive;
+  font-size: 48rpx;
+  line-height: 0.9;
+}
+.china-handwriting {
+  font-family: RoamHand, "Brush Script MT", cursive;
+  font-size: 75rpx;
+}
+.piece-0.cutout-piece {
+  left: 225rpx;
+  top: 150rpx;
+  width: 185rpx;
+  z-index: 2;
+}
+.piece-0.cutout-piece > image {
+  height: 390rpx;
+}
+.piece-1 {
+  left: 25rpx;
+  right: auto;
+  top: 90rpx;
+  transform: rotate(-7deg);
+}
+.board-tag {
+  left: auto;
+  right: 30rpx;
+  top: 70rpx;
+}
+.piece-2 {
+  left: 25rpx;
+  top: 450rpx;
+}
+.piece-3 {
+  right: 20rpx;
+  top: 480rpx;
+}
+.souvenir-board {
+  height: auto;
+  min-height: 820rpx;
+}

@@ -1,7 +1,6 @@
 {
   "pages": [
-    "pages/index/index",
-    "pages/preview/preview"
+    "pages/index/index"
   ],
   "window": {
     "navigationBarTitleText": "旅迹 · 私人旅行手账",

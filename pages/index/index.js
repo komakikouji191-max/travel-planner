@@ -1,3 +1,4 @@
+const Atlas = require("../../utils/atlas");
 const KEY = "roam-memory-v1";
 const filePaths = (store) =>
   new Set([
@@ -15,7 +16,7 @@ const places = [
   { name: "巴黎", country: "法国", latitude: 48.8566, longitude: 2.3522 },
   { name: "纽约", country: "美国", latitude: 40.7128, longitude: -74.006 },
 ];
-const sample = () => ({
+const baseSample = () => ({
   demo: true,
   trips: [
     {
@@ -60,14 +61,155 @@ const sample = () => ({
       ],
     },
   ],
-  souvenirs: [{id:"demo-postcard",name:"洱海风景明信片",kind:"明信片",date:"2026-04-14",note:"示例插画：从一段旅行里带回来的小小纪念。你可以从自己的相册添加真正的收藏。",photos:["/assets/postcard.jpg"],tripId:"demo",city:"大理"}],
+  souvenirs: [
+    {
+      id: "demo-postcard",
+      name: "洱海风景明信片",
+      kind: "明信片",
+      date: "2026-04-14",
+      note: "示例插画：从一段旅行里带回来的小小纪念。你可以从自己的相册添加真正的收藏。",
+      photos: ["/assets/postcard.jpg"],
+      tripId: "demo",
+      city: "大理",
+    },
+  ],
 });
+const cityEnglish = {
+  大理: "Dali",
+  杭州: "Hangzhou",
+  东京: "Tokyo",
+  巴黎: "Paris",
+  纽约: "New York",
+  成都: "Chengdu",
+  曼谷: "Bangkok",
+  圣托里尼: "Santorini",
+};
+const countryEnglish = {
+  中国: "China",
+  日本: "Japan",
+  美国: "USA",
+  法国: "France",
+  泰国: "Thailand",
+  希腊: "Greece",
+};
+const sample = () => {
+  const store = baseSample();
+  const t = store.trips[0];
+  t.end = "2026-04-18";
+  t.note = "在这里，\n风和日落都很温柔，\n也很像我喜欢的生活。";
+  t.stops.forEach((s) => {
+    s.date = "2026-04-13";
+    s.photos.push("/assets/lake.jpg", "/assets/blue-town.jpg");
+  });
+  t.stops[0].name = "洱海边的早餐";
+  t.stops[0].time = "08:30";
+  t.stops[1].name = "喜洲古镇";
+  t.stops[1].time = "11:20";
+  t.stops[2].name = "双廊";
+  t.stops[2].time = "16:30";
+  t.stops.forEach(stop=>stop.kind='普通');
+  t.stops.push({id:'demo-sunrise',name:'洱海的第一缕光',date:'2026-04-14',time:'06:20',kind:'日出',note:'天光亮起的时候，山也醒了。',photos:['/assets/sunrise.jpg']},{id:'demo-sunset',name:'洱海边的日落',date:'2026-04-14',time:'18:40',kind:'日落',note:'把这一刻的金色留在这里。',photos:['/assets/sunset.jpg']});
+  const extras = [
+    [
+      "东京",
+      "日本",
+      35.6762,
+      139.6503,
+      "2026-03-01",
+      "2026-03-08",
+      "blue-town",
+    ],
+    ["曼谷", "泰国", 13.7563, 100.5018, "2026-01-20", "2026-01-26", "lake"],
+    [
+      "圣托里尼",
+      "希腊",
+      36.3932,
+      25.4615,
+      "2025-10-01",
+      "2025-10-08",
+      "sunset",
+    ],
+    ["纽约", "美国", 40.7128, -74.006, "2025-05-10", "2025-05-20", "blue-town"],
+  ];
+  extras.forEach((a, i) =>
+    store.trips.push({
+      id: "demo-" + i,
+      city: a[0],
+      country: a[1],
+      latitude: a[2],
+      longitude: a[3],
+      date: a[4],
+      end: a[5],
+      title: cityEnglish[a[0]] + " · 旅行示例",
+      note: "示例旅行：替换成属于自己的回忆。",
+      photos: ["/assets/" + a[6] + ".jpg"],
+      stops: [],
+    }),
+  );
+  store.souvenirs = [
+    {
+      id: "demo-chime",
+      name: "大理手绘风铃",
+      kind: "手工艺品",
+      date: "2026-04-15",
+      note: "在古城的小店里找到的蓝白风铃。示例素材，换成你旅途中带回来的收藏。",
+      tripId: "demo",
+      city: "大理",
+      cutout: true,
+      photos: ["/assets/chime.png"],
+    },
+    ...store.souvenirs,
+    {
+      id: "demo-blue",
+      name: "苍山与洱海",
+      kind: "明信片",
+      date: "2026-04-16",
+      note: "把远方寄给未来的自己。",
+      tripId: "demo",
+      city: "大理",
+      photos: ["/assets/blue-town.jpg"],
+    },
+    {
+      id: "demo-sunset",
+      name: "一张日落纪念卡",
+      kind: "明信片",
+      date: "2026-04-17",
+      note: "收藏一场金色的日落。",
+      tripId: "demo",
+      city: "大理",
+      photos: ["/assets/sunset.jpg"],
+    },
+  ];
+  return store;
+};
 Page({
   data: {
     tab: "map",
     detail: false,
     mode: "film",
-    scope: "中国",
+    scope: "世界",
+    atlasLayer: "cities",
+    detailTab: "Overview",
+    timelineOnly: false,
+    lightView: "map",
+    lightMonth: 12,
+    lightCity: "全部",
+    souvenirFilter: "All",
+    souvenirFilters: ["All", "China", "Asia", "Europe", "America"],
+    lightFilters: [
+      { id: "全部", label: "All" },
+      { id: "日出", label: "Sunrise" },
+      { id: "日落", label: "Sunset" },
+    ],
+    viewer: false,
+    viewerIndex: 0,
+    fullPhoto: false,
+    atlasLayers: [
+      { id: "cities", label: "Cities" },
+      { id: "provinces", label: "Provinces" },
+      { id: "route", label: "My Route" },
+    ],
+    detailTabs: ["Overview", "Photos", "Itinerary", "Notes"],
     filter: "全部",
     year: "全部",
     day: "全部",
@@ -81,14 +223,34 @@ Page({
     cityOptions: places.map((p) => p.name),
     filters: ["全部", "日出", "日落"],
     tabs: [
-      { id: "map", icon: "◎", label: "足迹" },
-      { id: "trips", icon: "▤", label: "旅行" },
-      { id: "add", icon: "＋", label: "记录" },
-      { id: "light", icon: "☼", label: "追光" },
-      { id: "mine", icon: "○", label: "我的" },
+      { id: "map", asset: "/assets/nav-map.png", icon: "◎", label: "Map" },
+      {
+        id: "trips",
+        asset: "/assets/nav-trips.png",
+        icon: "▤",
+        label: "Trips",
+      },
+      { id: "add", icon: "＋", label: "" },
+      {
+        id: "light",
+        asset: "/assets/nav-light.png",
+        icon: "☼",
+        label: "Moments",
+      },
+      {
+        id: "mine",
+        asset: "/assets/nav-mine.png",
+        icon: "○",
+        label: "Profile",
+      },
     ],
   },
   onLoad() {
+    this.setData({
+      safeTop: wx.getWindowInfo
+        ? (wx.getWindowInfo().statusBarHeight || 24) + 36
+        : 64,
+    });
     try {
       const v = wx.getStorageSync(KEY);
       this.store =
@@ -98,8 +260,18 @@ Page({
     } catch (e) {
       this.store = sample();
     }
+    if (
+      this.store.demo &&
+      this.store.trips.length === 1 &&
+      this.store.trips[0].id === "demo"
+    )
+      this.store = sample();
     this.persistedFiles = filePaths(this.store);
     this.refresh();
+  },
+  onReady() {
+    this.pageReady = true;
+    this.drawAtlas();
   },
   refresh() {
     const trips = this.store.trips;
@@ -107,7 +279,7 @@ Page({
     this.activeId = active && active.id;
     const all = trips.flatMap((t) =>
       t.stops.flatMap((s) =>
-        s.photos.map((url) => ({ ...s, url, city: t.city, tripId: t.id })),
+        s.photos.map((url, index) => ({ ...s, url, photoKey:s.id+'-'+index, city: t.city, tripId: t.id })),
       ),
     );
     const lights = all.filter(
@@ -148,15 +320,15 @@ Page({
     }));
     const photos = active
       ? [
-          ...active.photos.map((url) => ({
-            url,
+          ...active.photos.map((url, index) => ({
+            url, photoKey:'cover-'+active.id+'-'+index,
             date: active.date,
             time: "",
             name: active.title,
             kind: "普通",
           })),
           ...active.stops.flatMap((s) =>
-            s.photos.map((url) => ({ ...s, url })),
+            s.photos.map((url,index) => ({ ...s, url, photoKey:s.id+'-'+index })),
           ),
         ]
       : [];
@@ -167,6 +339,12 @@ Page({
       demo: this.store.demo,
       trips: trips.map((t) => ({
         ...t,
+        displayCity: cityEnglish[t.city] || t.city,
+        displayCountry: countryEnglish[t.country] || t.country,
+        days: Math.max(
+          1,
+          Math.round((Date.parse(t.end) - Date.parse(t.date)) / 86400000) + 1,
+        ),
         cover:
           t.photos[0] ||
           (t.stops.find((s) => s.photos.length) || { photos: [] }).photos[0] ||
@@ -178,8 +356,17 @@ Page({
           (t) =>
             this.data.year === "全部" || t.date.slice(0, 4) === this.data.year,
         )
+        .sort((a, b) => b.date.localeCompare(a.date))
         .map((t) => ({
           ...t,
+          displayCity: cityEnglish[t.city] || t.city,
+          displayCountry: countryEnglish[t.country] || t.country,
+          days: Math.max(
+            1,
+            Math.round((Date.parse(t.end) - Date.parse(t.date)) / 86400000) + 1,
+          ),
+          count:
+            t.photos.length + t.stops.reduce((n, s) => n + s.photos.length, 0),
           cover:
             t.photos[0] ||
             (t.stops.find((s) => s.photos.length) || { photos: [] })
@@ -191,6 +378,71 @@ Page({
         ...[...new Set(trips.map((t) => t.date.slice(0, 4)))].sort().reverse(),
       ],
       active: active || null,
+      activeEnglish:
+        {
+          大理: "DALI",
+          杭州: "HANGZHOU",
+          东京: "TOKYO",
+          巴黎: "PARIS",
+          纽约: "NEW YORK",
+          成都: "CHENGDU",
+        }[active && active.city] || (active ? active.city.toUpperCase() : ""),
+      activeProvince: active
+        ? (
+            Atlas.regionSummary(
+              Atlas.model(this.store, "中国", "cities"),
+              Atlas.regionFor(active, "中国"),
+            ).english || active.country
+          ).toUpperCase()
+        : "",
+      activeCover: active
+        ? active.photos[0] ||
+          (active.stops.find((s) => s.photos.length) || { photos: [] })
+            .photos[0] ||
+          "/assets/sunset.jpg"
+        : "",
+      activeDays: active
+        ? Math.max(
+            1,
+            Math.round(
+              (Date.parse(active.end) - Date.parse(active.date)) / 86400000,
+            ) + 1,
+          )
+        : 0,
+      activeSunrises: active
+        ? active.stops.filter((s) => s.kind === "日出").length
+        : 0,
+      activeSunsets: active
+        ? active.stops.filter((s) => s.kind === "日落").length
+        : 0,
+      dayCount: Atlas.model(this.store, this.data.scope, this.data.atlasLayer)
+        .days,
+      itineraryDays: active
+        ? Array.from(
+            {
+              length: Math.min(
+                366,
+                Math.max(
+                  1,
+                  Math.round(
+                    (Date.parse(active.end) - Date.parse(active.date)) /
+                      86400000,
+                  ) + 1,
+                ),
+              ),
+            },
+            (_, i) => {
+              const date = new Date(Date.parse(active.date) + i * 86400000)
+                .toISOString()
+                .slice(0, 10);
+              return {
+                date,
+                label: "Day " + String(i + 1).padStart(2, "0"),
+                short: date.slice(5).replace("-", "."),
+              };
+            },
+          )
+        : [],
       photos,
       photoUrls: photos.map((p) => p.url),
       dates: ["全部", ...dates],
@@ -199,9 +451,46 @@ Page({
             .filter((s) => this.data.day === "全部" || s.date === this.data.day)
             .slice()
             .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
+            .map((s) => ({
+              ...s,
+              previewPhotos: s.photos.slice(1, 3),
+              overflow: Math.max(0, s.photos.length - 3),
+            }))
         : [],
-      lights,
+      lights: lights
+        .filter(
+          (p) =>
+            this.data.lightCity === "全部" || p.city === this.data.lightCity,
+        )
+        .map((p) => ({ ...p, displayCity: cityEnglish[p.city] || p.city })),
+      allLightPhotos: all.filter((p) => p.kind !== "普通"),
+      lightCities: [
+        "全部",
+        ...new Set(all.filter((p) => p.kind !== "普通").map((p) => p.city)),
+      ],
+      lightCountryCount: new Set(
+        all
+          .filter((p) => p.kind !== "普通")
+          .map((p) => (trips.find((t) => t.id === p.tripId) || {}).country),
+      ).size,
       souvenirs: this.store.souvenirs,
+      visibleSouvenirs: this.store.souvenirs.filter((s) => {
+        const trip = trips.find((t) => t.id === s.tripId) || {};
+        const country = trip.country || "中国";
+        const continents = {
+          中国: "China",
+          日本: "Asia",
+          泰国: "Asia",
+          法国: "Europe",
+          希腊: "Europe",
+          美国: "America",
+          加拿大: "America",
+        };
+        return (
+          this.data.souvenirFilter === "All" ||
+          (continents[country] || "Other") === this.data.souvenirFilter
+        );
+      }),
       markers,
       circles,
       cityCount: this.cities.length,
@@ -217,6 +506,12 @@ Page({
       ),
       tripNames: trips.map((t) => `${t.city} · ${t.date}`),
     });
+    if (
+      this.pageReady &&
+      (this.data.tab === "map" || this.data.tab === "light") &&
+      !this.data.detail
+    )
+      this.queueAtlas();
   },
   persist() {
     try {
@@ -244,7 +539,8 @@ Page({
       this.openAdd();
       return;
     }
-    this.setData({ tab, detail: false });
+    this.setData({ tab, detail: false, viewer: false });
+    if (tab === "map" || tab === "light") this.queueAtlas();
   },
   openAdd() {
     wx.showActionSheet({
@@ -503,7 +799,15 @@ Page({
   openTrip(e) {
     this.setData({ citySheet: null });
     this.activeId = e.currentTarget.dataset.id;
-    this.setData({ detail: true, mode: "film", day: "全部", tilt: 0 });
+    this.setData({
+      detail: true,
+      mode: "film",
+      day: "全部",
+      detailTab: "Overview",
+      viewer: false,
+      timelineOnly: false,
+      tilt: 0,
+    });
     this.refresh();
   },
   markerTap(e) {
@@ -517,7 +821,14 @@ Page({
         return;
       }
       this.activeId = c.id;
-      this.setData({ detail: true, mode: "film", day: "全部" });
+      this.setData({
+        detail: true,
+        mode: "film",
+        day: "全部",
+        detailTab: "Overview",
+        viewer: false,
+        timelineOnly: false,
+      });
       this.refresh();
     }
   },
@@ -525,10 +836,13 @@ Page({
     this.setData({ citySheet: null });
   },
   back() {
-    this.setData({ detail: false });
+    this.setData({ detail: false, viewer: false });
+    this.queueAtlas();
   },
   scope(e) {
     this.setData({ scope: e.currentTarget.dataset.value });
+    this.selectedRegion = null;
+    this.queueAtlas();
   },
   mode(e) {
     this.setData({ mode: e.currentTarget.dataset.value });
@@ -591,7 +905,8 @@ Page({
           this.store = before;
           return;
         }
-        this.setData({ detail: false });
+        this.setData({ detail: false, viewer: false });
+        this.queueAtlas();
       },
     });
   },
@@ -604,8 +919,12 @@ Page({
           const before = this.store;
           this.store = {
             demo: false,
-            trips: before.trips.filter((t) => t.id !== "demo"),
-            souvenirs: before.souvenirs.filter((s) => s.tripId !== "demo"),
+            trips: before.trips.filter(
+              (t) => t.id !== "demo" && !t.id.startsWith("demo-"),
+            ),
+            souvenirs: before.souvenirs.filter(
+              (s) => s.tripId !== "demo" && !s.tripId.startsWith("demo-"),
+            ),
           };
           if (!this.persist()) this.store = before;
         }
@@ -679,7 +998,273 @@ Page({
       },
     });
   },
-  openDesign(){wx.navigateTo({url:"/pages/preview/preview"});},
+
+  queueAtlas() {
+    if (!this.pageReady) return;
+    wx.nextTick(() => this.drawAtlas());
+  },
+  drawAtlas() {
+    if (this.data.tab === "light") {
+      this.drawLightMap();
+      return;
+    }
+    if (this.data.tab !== "map" || this.data.detail || !wx.createSelectorQuery)
+      return;
+    wx.createSelectorQuery()
+      .in(this)
+      .select(".atlas-canvas")
+      .fields({ node: true, size: true, rect: true })
+      .exec((result) => {
+        const r = result && result[0];
+        if (!r || !r.node || !r.width || !r.height) return;
+        const canvas = r.node,
+          dpr =
+            (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync())
+              .pixelRatio || 1;
+        canvas.width = r.width * dpr;
+        canvas.height = r.height * dpr;
+        const ctx = canvas.getContext("2d");
+        ctx.scale(dpr, dpr);
+        this.atlasModel = Atlas.model(
+          this.store,
+          this.data.scope,
+          this.data.atlasLayer,
+        );
+        const rendered = Atlas.render(ctx, r.width, r.height, this.atlasModel);
+        this.atlasShapes = rendered.shapes;
+        this.atlasRect = r;
+        const points = rendered.points;
+        const first = points[0];
+        const region =
+          this.selectedRegion ||
+          (first
+            ? this.data.scope === "中国"
+              ? first.regionChina
+              : first.regionWorld
+            : "云南省");
+        const summary = Atlas.regionSummary(this.atlasModel, region);
+        const unique = new Set();
+        const stickers = points
+          .filter((p) => {
+            const key = this.data.scope === "中国" ? p.name : p.regionWorld;
+            if (!p.photos.length || unique.has(key)) return false;
+            unique.add(key);
+            return true;
+          })
+          .slice(0, 5)
+          .map((p, i) => ({
+            ...p,
+            x: Math.max(9, Math.min(89, p.x + (i % 2 ? 5 : -5))),
+            y: Math.max(15, Math.min(88, p.y + 10)),
+            angle: i % 2 ? 5 : -5,
+          }));
+        this.setData({
+          atlasPoints: points,
+          atlasStickers: stickers,
+          atlasRegion: summary,
+        });
+      });
+  },
+  atlasLayer(e) {
+    this.setData({ atlasLayer: e.currentTarget.dataset.value });
+    this.queueAtlas();
+  },
+  atlasCityTap(e) {
+    const point = (this.data.atlasPoints || [])[
+      Number(e.currentTarget.dataset.index)
+    ];
+    if (!point) return;
+    const index = this.cities.findIndex((c) => c.id === point.id);
+    if (index >= 0) this.markerTap({ detail: { markerId: index } });
+  },
+  atlasStickerTap(e) {
+    this.openTrip({
+      currentTarget: { dataset: { id: e.currentTarget.dataset.id } },
+    });
+  },
+  atlasTap(e) {
+    if (!this.atlasRect) return;
+    let x = e.detail.x,
+      y = e.detail.y;
+    if (e.changedTouches && e.changedTouches[0]) {
+      const t = e.changedTouches[0];
+      x = t.x !== undefined ? t.x : t.clientX - this.atlasRect.left;
+      y = t.y !== undefined ? t.y : t.clientY - this.atlasRect.top;
+    }
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+    const region = Atlas.hit(this.atlasShapes, x, y);
+    if (region) {
+      this.selectedRegion = region;
+      this.setData({
+        atlasRegion: Atlas.regionSummary(this.atlasModel, region),
+      });
+    }
+  },
+  atlasRegionOpen() {
+    const r = this.data.atlasRegion;
+    if (r && r.cityList.length) {
+      const ids = new Set(r.cityList.flatMap((c) => c.trips.map((t) => t.id)));
+      this.setData({
+        citySheet: {
+          name: r.short,
+          trips: this.data.trips.filter((t) => ids.has(t.id)),
+        },
+      });
+    } else {
+      this.addTrip();
+      if (this.data.scope === "世界" && r)
+        this.setData({ "form.country": r.name });
+    }
+  },
+  detailTab(e) {
+    const tab = e.currentTarget.dataset.value;
+    this.setData({ detailTab: tab });
+    if (tab === "Photos" && this.data.photos.length)
+      this.openViewer({ currentTarget: { dataset: { index: 0 } } });
+  },
+  openViewer(e) {
+    const index = Number(e.currentTarget.dataset.index) || 0;
+    if (!this.data.photos.length) {
+      this.addStop();
+      return;
+    }
+    this.setData({ viewer: true, viewerIndex: index, fullPhoto: false });
+  },
+  closeViewer() {
+    this.setData({ viewer: false, fullPhoto: false, tilt: 0 });
+  },
+  viewerChange(e) {
+    this.setData({ viewerIndex: e.detail.current, tilt: 0 });
+  },
+  viewerThumb(e) {
+    this.setData({
+      viewerIndex: Number(e.currentTarget.dataset.index),
+      tilt: 0,
+    });
+  },
+  fullPhoto() {
+    this.setData({ fullPhoto: !this.data.fullPhoto, tilt: 0 });
+  },
+  toggleFavorite() {
+    const t = this.store.trips.find((t) => t.id === this.activeId);
+    if (!t) return;
+    const before = t.favorite;
+    t.favorite = !t.favorite;
+    if (!this.persist()) t.favorite = before;
+  },
+  cityMenu() {
+    wx.showActionSheet({
+      itemList: ["编辑旅行", "添加照片 / 地点", "删除旅行"],
+      success: (r) => {
+        if (r.tapIndex === 0) this.editTrip();
+        else if (r.tapIndex === 1) this.addStop();
+        else this.deleteTrip();
+      },
+    });
+  },
+  shareMemory() {
+    wx.showActionSheet({
+      itemList: ["复制旅行文字", "预览原图（可长按保存）"],
+      success: (r) => {
+        if (r.tapIndex === 0) this.exportText();
+        else if (this.data.photos.length) {
+          const p = this.data.photos[this.data.viewerIndex || 0];
+          wx.previewImage({ current: p.url, urls: this.data.photoUrls });
+        }
+      },
+    });
+  },
+  exportText() {
+    const t = this.data.active;
+    if (!t) return;
+    const text = [
+      t.city + " · " + t.country,
+      t.date + " — " + t.end,
+      t.note,
+      ...t.stops.map(
+        (s) => s.date + " " + s.time + " " + s.name + "\n" + s.note,
+      ),
+    ].join("\n\n");
+    wx.setClipboardData({ data: text });
+  },
+
+  openItinerary(e) {
+    this.openTrip(e);
+    this.setData({
+      timelineOnly: true,
+      day: this.data.active.stops[0]
+        ? this.data.active.stops[0].date
+        : this.data.active.date,
+    });
+    this.refresh();
+  },
+  setLightView(e) {
+    this.setData({ lightView: e.currentTarget.dataset.value });
+    this.queueAtlas();
+  },
+  setLightCity(e) {
+    this.setData({ lightCity: this.data.lightCities[Number(e.detail.value)] });
+    this.refresh();
+  },
+  setSouvenirFilter(e) {
+    this.setData({ souvenirFilter: e.currentTarget.dataset.value });
+    this.refresh();
+  },
+  month(e) {
+    this.setData({ lightMonth: Number(e.detail.value) });
+    this.queueAtlas();
+  },
+  drawLightMap() {
+    if (this.data.lightView !== "map" || !wx.createSelectorQuery) return;
+    wx.createSelectorQuery()
+      .in(this)
+      .select(".light-canvas")
+      .fields({ node: true, size: true })
+      .exec((results) => {
+        const r = results && results[0];
+        if (!r || !r.node || !r.width) return;
+        const dpr =
+          (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync())
+            .pixelRatio || 1;
+        r.node.width = r.width * dpr;
+        r.node.height = r.height * dpr;
+        const ctx = r.node.getContext("2d");
+        ctx.scale(dpr, dpr);
+        const trips = this.store.trips
+          .map((t) => ({
+            ...t,
+            stops: t.stops.filter(
+              (s) =>
+                s.kind !== "普通" &&
+                Number(s.date.slice(5, 7)) <= this.data.lightMonth,
+            ),
+          }))
+          .filter((t) => t.stops.length);
+        const store = { ...this.store, trips };
+        Atlas.render(
+          ctx,
+          r.width,
+          r.height,
+          Atlas.model(store, "世界", "route"),
+          { dark: true },
+        );
+        this.setData({
+          monthLightPhotos: trips.flatMap((t) =>
+            t.stops.flatMap((s) =>
+              s.photos.map((url) => ({
+                url,
+                date: s.date,
+                kind: s.kind,
+                city: t.city,
+              })),
+            ),
+          ),
+        });
+      });
+  },
+  lightMapTap() {
+    this.setData({ lightView: "gallery" });
+  },
   onShareAppMessage() {
     return { title: "旅迹 · 收藏走过的世界", path: "/pages/index/index" };
   },
