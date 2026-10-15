@@ -17,5 +17,6 @@
   },
   "requiredPrivateInfos": [
     "chooseLocation"
-  ]
+  ],
+  "lazyCodeLoading": "requiredComponents"
 }

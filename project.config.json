@@ -53,6 +53,10 @@
       {
         "type": "file",
         "value": "打开小程序.txt"
+      },
+      {
+        "type": "file",
+        "value": ".eslintrc.js"
       }
     ],
     "include": []
