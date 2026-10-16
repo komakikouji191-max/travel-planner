@@ -43,6 +43,8 @@ assert.ok(runtimeBytes<1400000,`Runtime source budget exceeded: ${runtimeBytes} 
 const projectFiles=fs.readdirSync(root).filter(n=>n!=='.git').flatMap(walk);
 const media=projectFiles.filter(f=>/\.(?:jpe?g|png|gif|webp|mp3|mp4|wav|m4a)$/i.test(f));
 for(const file of media)assert.ok(fs.statSync(path.join(root,file)).size<=200000,`Media exceeds 200 KB: ${file}`);
+const mediaBytes=media.reduce((n,f)=>n+fs.statSync(path.join(root,f)).size,0);
+assert.ok(mediaBytes<100000,`Aggregate project media budget exceeded: ${mediaBytes} bytes (budget 100,000, below 200 KB)`);
 for(const file of runtimeFiles.filter(f=>f.startsWith('utils/')&&f.endsWith('.js')))execFileSync(process.execPath,['--check',file]);
-console.log(`PASS: lazy loading; runtime source ${runtimeBytes.toLocaleString('en-US')} bytes; ${media.length} media files across the entire project each <=200,000 bytes.`);
+console.log(`PASS: lazy loading; runtime source ${runtimeBytes.toLocaleString('en-US')} bytes; ${media.length} media files across the entire project, total ${mediaBytes.toLocaleString('en-US')} bytes (<100,000); each <=200,000 bytes.`);
 console.log('DevTools must rescan its compiled package to confirm the final 1.5 MB recommendation.');

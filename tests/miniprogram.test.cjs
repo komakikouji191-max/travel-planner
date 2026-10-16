@@ -493,19 +493,16 @@ test("mouse motion changes film tilt without changing navigation or personal rec
   assert.equal(p.data.detail, true);
 });
 
-test("expanded preview contains at least ten countries and all bundled demo images exist", () => {
-  const { p } = harness();
-  assert.ok(p.data.countryCount >= 10);
-  assert.ok(p.data.cityCount >= 15);
-  const A = pageRequire("../../utils/atlas");
-  assert.ok(A.lightFootprints(p.store).length >= 20);
-  for (const trip of p.store.trips) {
-    for (const url of [
-      ...trip.photos,
-      ...trip.stops.flatMap((s) => s.photos),
-    ]) {
-      if (url.startsWith("/assets/"))
-        assert.ok(fs.existsSync(url.slice(1)), url);
-    }
-  }
+test('expanded preview uses only known immutable remote artwork or personal files',()=>{
+ const {p}=harness();const M=pageRequire('../../utils/media');assert.ok(p.data.countryCount>=10);assert.ok(p.data.cityCount>=15);const A=pageRequire('../../utils/atlas');assert.ok(A.lightFootprints(p.store).length>=20);
+ let checked=0;for(const trip of p.store.trips){for(const url of [...trip.photos,...trip.stops.flatMap(s=>s.photos)]){assert.ok(url.startsWith('https://'));assert.ok(url.includes(M.REVISION));assert.ok(M.NAMES.includes(url.split('/').pop()));checked++;}}
+ assert.ok(checked>=50);
+});
+
+test('legacy demo images migrate but personal files, external URLs and journal fields remain intact',()=>{
+ const M=pageRequire('../../utils/media');const store={demo:false,trips:[{id:'my-trip',title:'Keep my title',photos:['/assets/sunset.jpg','wxfile://usr/personal.jpg','https://example.com/personal.jpg'],stops:[{id:'place',note:'My own note',photos:['/assets/sunrise.jpg']}]}],souvenirs:[{id:'object',photos:['/assets/chime.png']}]};
+ M.resolveStore(store);assert.equal(store.trips[0].photos[0],M.url('sunset.jpg'));assert.equal(store.trips[0].photos[1],'wxfile://usr/personal.jpg');assert.equal(store.trips[0].photos[2],'https://example.com/personal.jpg');assert.equal(store.trips[0].title,'Keep my title');assert.equal(store.trips[0].stops[0].note,'My own note');assert.equal(store.souvenirs[0].photos[0],M.url('chime.png'));const before=JSON.stringify(store);M.resolveStore(store);assert.equal(JSON.stringify(store),before);
+});
+test('demo image failover uses the same immutable image and does not rewrite arbitrary URLs',()=>{
+ const M=pageRequire('../../utils/media');const original=M.url('cork.jpg');assert.equal(M.failover('https://example.com/private.jpg'),false);assert.equal(M.failover(original),true);assert.ok(M.url('cork.jpg').startsWith('https://raw.githubusercontent.com/'));assert.ok(M.url('cork.jpg').includes(M.REVISION));assert.equal(M.failover(M.url('cork.jpg')),false);assert.equal(M.resolve('wxfile://usr/a.jpg'),'wxfile://usr/a.jpg');
 });

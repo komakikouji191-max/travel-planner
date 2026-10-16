@@ -1,3 +1,4 @@
+const Media=require("./media");
 // Additive, clearly labelled preview content. Never run for a personal (demo:false) journal.
 const VERSION = 3;
 const destinations = [
@@ -37,7 +38,7 @@ function lightStops(t, photo) {
       time: "06:20",
       kind: "日出",
       note: "DEMO · A quiet morning, kept forever.",
-      photos: ["/assets/sunrise.jpg", "/assets/" + photo + ".jpg"],
+      photos: [Media.url("sunrise.jpg"), Media.url(photo+".jpg")],
       latitude: t.latitude + 0.015,
       longitude: t.longitude - 0.015,
     },
@@ -48,7 +49,7 @@ function lightStops(t, photo) {
       time: "18:40",
       kind: "日落",
       note: "DEMO · The sky was worth the wait.",
-      photos: ["/assets/sunset.jpg", "/assets/" + photo + ".jpg"],
+      photos: [Media.url("sunset.jpg"), Media.url(photo+".jpg")],
       latitude: t.latitude - 0.015,
       longitude: t.longitude + 0.015,
     },
@@ -69,7 +70,7 @@ function enrich(store) {
       end: a[5],
       title: a[0] + " · A chapter of light",
       note: "DEMO JOURNAL\nSome places stay with you.",
-      photos: ["/assets/" + a[6] + ".jpg"],
+      photos: [Media.url(a[6]+".jpg")],
       stops: [],
     };
     t.stops = lightStops(t, a[6]);

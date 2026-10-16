@@ -37,7 +37,7 @@
               mode="aspectFill"
               data-url="{{item.photos[0]}}"
               data-urls="{{item.photos}}"
-              bindtap="preview" /></view
+              bindtap="preview"  data-media-src="{{item.photos[0]}}" binderror="mediaError"/></view
           ><view class="diary-content"
             ><view class="diary-name" data-id="{{item.id}}" bindtap="editStop"
               >{{item.name}}</view
@@ -52,7 +52,7 @@
                 data-url="{{url}}"
                 data-urls="{{item.photos}}"
                 bindtap="preview"
-              /><view
+               data-media-src="{{url}}" binderror="mediaError"/><view
                 wx:if="{{item.overflow}}"
                 class="diary-overflow"
                 data-url="{{item.photos[0]}}"
@@ -68,7 +68,7 @@
       ><view class="small-add" bindtap="addStop">+ Add a place</view></view
     ><block wx:else>
       <view class="city-hero">
-        <image class="hero-photo" src="{{activeCover}}" mode="aspectFill" />
+        <image class="hero-photo" src="{{activeCover}}" mode="aspectFill"  data-media-src="{{activeCover}}" binderror="mediaError"/>
         <view class="hero-shade"></view>
         <view class="city-tools" style="top:{{safeTop}}px"
           ><text bindtap="back">‹</text
@@ -135,7 +135,7 @@
                 bindtap="openViewer"
                 ><view class="reel-number"
                   >ROAM 400 <text>{{index + 1}}</text></view
-                ><image src="{{item.url}}" mode="aspectFill" /><view
+                ><image src="{{item.url}}" mode="aspectFill"  data-media-src="{{item.url}}" binderror="mediaError"/><view
                   class="reel-number"
                   >{{item.time}}　 ▷</view
                 ></view
@@ -175,7 +175,7 @@
                   mode="aspectFill"
                   data-url="{{url}}"
                   data-urls="{{item.photos}}"
-                  bindtap="preview" /></scroll-view
+                  bindtap="preview"  data-media-src="{{url}}" binderror="mediaError"/></scroll-view
               ><view class="record-actions"
                 ><text data-id="{{item.id}}" bindtap="editStop">编辑</text
                 ><text data-id="{{item.id}}" bindtap="deleteStop"
@@ -266,7 +266,7 @@
         data-id="{{item.id}}"
         bindtap="atlasStickerTap"
         ><image src="{{item.photos[0]}}" mode="aspectFill"
-      /></view>
+       data-media-src="{{item.photos[0]}}" binderror="mediaError"/></view>
       <view
         wx:if="{{scope === '中国' && atlasPoints.length}}"
         class="atlas-callout"
@@ -298,7 +298,7 @@
           mode="aspectFill"
           data-url="{{item}}"
           data-urls="{{atlasRegion.photos}}"
-          bindtap="preview" /></view
+          bindtap="preview"  data-media-src="{{item}}" binderror="mediaError"/></view
       ><view wx:else class="province-empty" bindtap="atlasRegionOpen"
         >＋ 记录这里的第一段回忆</view
       ></view
@@ -342,7 +342,7 @@
         wx:if="{{item.cover}}"
         src="{{item.cover}}"
         mode="aspectFill"
-      /><view wx:else class="trip-placeholder">✦</view
+       data-media-src="{{item.cover}}" binderror="mediaError"/><view wx:else class="trip-placeholder">✦</view
       ><view class="reference-trip-copy"
         ><view>{{item.displayCity}} · {{item.displayCountry}}</view
         ><text>{{item.date}} - {{item.end}}</text
@@ -376,7 +376,7 @@
           src="{{item.url}}"
           mode="aspectFill"
           data-url="{{item.url}}"
-          bindtap="preview" /></scroll-view
+          bindtap="preview"  data-media-src="{{item.url}}" binderror="mediaError"/></scroll-view
       ><slider
         class="light-slider"
         min="1"
@@ -426,7 +426,7 @@
       ><view class="golden-grid"
         ><view wx:for="{{lights}}" wx:key="photoKey" class="golden-card"
           ><view class="golden-photo" data-url="{{item.url}}" bindtap="preview"
-            ><image src="{{item.url}}" mode="aspectFill" /><text
+            ><image src="{{item.url}}" mode="aspectFill"  data-media-src="{{item.url}}" binderror="mediaError"/><text
               >{{item.kind === '日出' ? '☼' : '◒'}}</text
             ></view
           ><view class="golden-caption"
@@ -456,9 +456,9 @@
     ><view class="souvenir-board"
       ><image
         class="cork-backing"
-        src="/assets/cork.jpg"
+        src="{{media.cork}}"
         mode="aspectFill"
-      /><view class="board-string"></view
+       data-media-src="{{media.cork}}" binderror="mediaError"/><view class="board-string"></view
       ><view
         wx:for="{{visibleSouvenirs}}"
         wx:key="id"
@@ -469,7 +469,7 @@
         ><image
           src="{{item.photos[0]}}"
           mode="{{item.cutout ? 'aspectFit' : 'aspectFill'}}"
-        /><view class="piece-label"
+         data-media-src="{{item.photos[0]}}" binderror="mediaError"/><view class="piece-label"
           >{{item.city}}<text>{{item.name}}</text></view
         ></view
       ><view class="board-tag"><view>大理</view>DALI</view
@@ -504,7 +504,7 @@
     ><view class="quote serif">世界辽阔，幸好有迹可循。</view></block
   >
   <view wx:if="{{tab === 'mine' && !detail}}" class="footer-note"
-    >ROAM · 留下足迹，带走故事</view
+    >ROAM · v2.2.1</view
   >
 </view>
 <view wx:if="{{!detail}}" class="bottom-nav"
@@ -515,7 +515,7 @@
     data-id="{{item.id}}"
     bindtap="nav"
     ><view wx:if="{{item.id === 'add'}}">＋</view
-    ><image wx:else class="nav-drawing" src="{{item.asset}}" /><text
+    ><image wx:else class="nav-drawing" src="{{item.asset}}"  data-media-src="{{item.asset}}" binderror="mediaError"/><text
       >{{item.label}}</text
     ></view
   ></view
@@ -540,7 +540,7 @@
       ></view
     ><scroll-view scroll-x class="draft-photos"
       ><view wx:for="{{form.photos}}" wx:key="*this"
-        ><image src="{{item}}" mode="aspectFill" /><text
+        ><image src="{{item}}" mode="aspectFill"  data-media-src="{{item}}" binderror="mediaError"/><text
           data-index="{{index}}"
           bindtap="removePhoto"
           >×</text
@@ -670,7 +670,7 @@
       data-url="{{souvenir.photos[0]}}"
       data-urls="{{souvenir.photos}}"
       bindtap="preview"
-    /><text
+     data-media-src="{{souvenir.photos[0]}}" binderror="mediaError"/><text
       data-url="{{souvenir.photos[0]}}"
       data-urls="{{souvenir.photos}}"
       bindtap="preview"
@@ -684,7 +684,7 @@
       mode="aspectFill"
       data-url="{{item}}"
       data-urls="{{souvenir.photos}}"
-      bindtap="preview" /></view
+      bindtap="preview"  data-media-src="{{item}}" binderror="mediaError"/></view
   ><view class="souvenir-data-row"
     ><text>Name</text><view>{{souvenir.name}}</view></view
   ><view class="souvenir-data-row"
@@ -714,7 +714,7 @@
         wx:if="{{item.cover}}"
         src="{{item.cover}}"
         mode="aspectFill"
-      /><view class="trip-copy"
+       data-media-src="{{item.cover}}" binderror="mediaError"/><view class="trip-copy"
         ><view class="serif">{{item.title}}</view
         ><view>{{item.date}} — {{item.end}}</view></view
       ><text>↗</text></view
@@ -752,7 +752,7 @@
           data-url="{{item.url}}"
           data-urls="{{photoUrls}}"
           bindlongpress="preview"
-        /><view wx:if="{{!fullPhoto}}" class="viewer-film-label"
+         data-media-src="{{item.url}}" binderror="mediaError"/><view wx:if="{{!fullPhoto}}" class="viewer-film-label"
           >▷ {{item.date}} <text>{{index + 1}}</text></view
         ></view
       ></swiper-item
@@ -773,7 +773,7 @@
       mode="aspectFill"
       data-index="{{index}}"
       bindtap="viewerThumb"
-  /></scroll-view>
+   data-media-src="{{item.url}}" binderror="mediaError"/></scroll-view>
   <view class="viewer-info"
     ><view class="viewer-location"
       ><view>{{active.city}} · {{active.country}}</view

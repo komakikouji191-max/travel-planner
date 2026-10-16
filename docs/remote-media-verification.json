@@ -1,0 +1,76 @@
+{
+  "revision": "52787f34af1c905dc8381d2e843020f27ef3481d",
+  "scope": "Public demo artwork only. SHA256 matches the previously bundled image bytes.",
+  "files": [
+    {
+      "file": "cork.jpg",
+      "status": 200,
+      "bytes": 169186,
+      "sha256": "846970abbf8a81e0ac57093badbe2684534e63189b05cffcebfc54f29d219de8",
+      "url": "https://cdn.jsdelivr.net/gh/komakikouji191-max/travel-planner@52787f34af1c905dc8381d2e843020f27ef3481d/assets/cork.jpg"
+    },
+    {
+      "file": "postcard.jpg",
+      "status": 200,
+      "bytes": 43905,
+      "sha256": "2548f1be5f7519a6bac4e77fa84571ddf9354e1e782212aface76488a56d336c",
+      "url": "https://cdn.jsdelivr.net/gh/komakikouji191-max/travel-planner@52787f34af1c905dc8381d2e843020f27ef3481d/assets/postcard.jpg"
+    },
+    {
+      "file": "sunrise.jpg",
+      "status": 200,
+      "bytes": 143041,
+      "sha256": "7c4ae4fd8f7ba810a4815e01aa7f06129759480b9ff4c976754cfc6e6b405e27",
+      "url": "https://cdn.jsdelivr.net/gh/komakikouji191-max/travel-planner@52787f34af1c905dc8381d2e843020f27ef3481d/assets/sunrise.jpg"
+    },
+    {
+      "file": "sunset.jpg",
+      "status": 200,
+      "bytes": 165473,
+      "sha256": "dab6e25f6a382c9196d2c520c6f48cf58344b54afa641266b6c826b55877bb7d",
+      "url": "https://cdn.jsdelivr.net/gh/komakikouji191-max/travel-planner@52787f34af1c905dc8381d2e843020f27ef3481d/assets/sunset.jpg"
+    },
+    {
+      "file": "santorini.jpg",
+      "status": 200,
+      "bytes": 39090,
+      "sha256": "edb4bfa221f819676ddc3523f8ba2e6d43e3c2fca86d7f72b3b781394b45f3aa",
+      "url": "https://cdn.jsdelivr.net/gh/komakikouji191-max/travel-planner@52787f34af1c905dc8381d2e843020f27ef3481d/assets/santorini.jpg"
+    },
+    {
+      "file": "lake.jpg",
+      "status": 200,
+      "bytes": 43905,
+      "sha256": "2548f1be5f7519a6bac4e77fa84571ddf9354e1e782212aface76488a56d336c",
+      "url": "https://cdn.jsdelivr.net/gh/komakikouji191-max/travel-planner@52787f34af1c905dc8381d2e843020f27ef3481d/assets/lake.jpg"
+    },
+    {
+      "file": "chime.png",
+      "status": 200,
+      "bytes": 95335,
+      "sha256": "ba589b83fac5a4768c0ce9b471d13c30b61a76debc42f44e0914950e86872c50",
+      "url": "https://cdn.jsdelivr.net/gh/komakikouji191-max/travel-planner@52787f34af1c905dc8381d2e843020f27ef3481d/assets/chime.png"
+    },
+    {
+      "file": "blue-town.jpg",
+      "status": 200,
+      "bytes": 145414,
+      "sha256": "d145359ad35eee2ee30cccd5d59c1b658ea4fbca33cbb9ab6938310c2dcac9ae",
+      "url": "https://cdn.jsdelivr.net/gh/komakikouji191-max/travel-planner@52787f34af1c905dc8381d2e843020f27ef3481d/assets/blue-town.jpg"
+    },
+    {
+      "file": "new-york.jpg",
+      "status": 200,
+      "bytes": 51802,
+      "sha256": "15edddc774286a6b1a7e1a3e41e2fa2010a697ec294c43aeba51cd968fbf5954",
+      "url": "https://cdn.jsdelivr.net/gh/komakikouji191-max/travel-planner@52787f34af1c905dc8381d2e843020f27ef3481d/assets/new-york.jpg"
+    },
+    {
+      "file": "kyoto.jpg",
+      "status": 200,
+      "bytes": 109699,
+      "sha256": "c76da2f0a5a24557cc0eb339a50411b6bbb41ff4a66e470acabeb33a0177094c",
+      "url": "https://cdn.jsdelivr.net/gh/komakikouji191-max/travel-planner@52787f34af1c905dc8381d2e843020f27ef3481d/assets/kyoto.jpg"
+    }
+  ]
+}

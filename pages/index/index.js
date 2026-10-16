@@ -1,6 +1,7 @@
 const Atlas = require("../../utils/atlas");
 const Gestures = require("../../utils/gestures");
 const Demo = require("../../utils/demo");
+const Media = require("../../utils/media");
 const KEY = "roam-memory-v1";
 const filePaths = (store) =>
   new Set([
@@ -40,7 +41,7 @@ const baseSample = () => ({
           time: "18:40",
           note: "坐在岸边，等天空慢慢变成橘色。",
           kind: "日落",
-          photos: ["/assets/sunset.jpg"],
+          photos: [Media.url("sunset.jpg")],
         },
         {
           id: "s2",
@@ -49,7 +50,7 @@ const baseSample = () => ({
           time: "06:20",
           note: "天光亮起的时候，山也醒了。",
           kind: "日出",
-          photos: ["/assets/sunrise.jpg"],
+          photos: [Media.url("sunrise.jpg")],
         },
         {
           id: "s3",
@@ -58,7 +59,7 @@ const baseSample = () => ({
           time: "10:30",
           note: "没有赶路，只是走走停停。",
           kind: "普通",
-          photos: ["/assets/lake.jpg"],
+          photos: [Media.url("lake.jpg")],
         },
       ],
     },
@@ -70,7 +71,7 @@ const baseSample = () => ({
       kind: "明信片",
       date: "2026-04-14",
       note: "示例插画：从一段旅行里带回来的小小纪念。你可以从自己的相册添加真正的收藏。",
-      photos: ["/assets/postcard.jpg"],
+      photos: [Media.url("postcard.jpg")],
       tripId: "demo",
       city: "大理",
     },
@@ -112,7 +113,7 @@ const sample = () => {
   t.note = "在这里，\n风和日落都很温柔，\n也很像我喜欢的生活。";
   t.stops.forEach((s) => {
     s.date = "2026-04-13";
-    s.photos.push("/assets/lake.jpg", "/assets/blue-town.jpg");
+    s.photos.push(Media.url("lake.jpg"), Media.url("blue-town.jpg"));
   });
   t.stops[0].name = "洱海边的早餐";
   t.stops[0].time = "08:30";
@@ -129,7 +130,7 @@ const sample = () => {
       time: "06:20",
       kind: "日出",
       note: "天光亮起的时候，山也醒了。",
-      photos: ["/assets/sunrise.jpg"],
+      photos: [Media.url("sunrise.jpg")],
     },
     {
       id: "demo-sunset",
@@ -138,7 +139,7 @@ const sample = () => {
       time: "18:40",
       kind: "日落",
       note: "把这一刻的金色留在这里。",
-      photos: ["/assets/sunset.jpg"],
+      photos: [Media.url("sunset.jpg")],
     },
   );
   const extras = [
@@ -166,7 +167,7 @@ const sample = () => {
       end: a[5],
       title: cityEnglish[a[0]] + " · 旅行示例",
       note: "示例旅行：替换成属于自己的回忆。",
-      photos: ["/assets/" + a[6] + ".jpg"],
+      photos: [Media.url(a[6]+".jpg")],
       stops: [],
     }),
   );
@@ -180,7 +181,7 @@ const sample = () => {
       tripId: "demo",
       city: "大理",
       cutout: true,
-      photos: ["/assets/chime.png"],
+      photos: [Media.url("chime.png")],
     },
     ...store.souvenirs,
     {
@@ -191,7 +192,7 @@ const sample = () => {
       note: "把远方寄给未来的自己。",
       tripId: "demo",
       city: "大理",
-      photos: ["/assets/blue-town.jpg"],
+      photos: [Media.url("blue-town.jpg")],
     },
     {
       id: "demo-sunset",
@@ -201,13 +202,14 @@ const sample = () => {
       note: "收藏一场金色的日落。",
       tripId: "demo",
       city: "大理",
-      photos: ["/assets/sunset.jpg"],
+      photos: [Media.url("sunset.jpg")],
     },
   ];
   return store;
 };
 Page({
   data: {
+    media:Media.ui(),
     tab: "map",
     detail: false,
     mode: "film",
@@ -294,10 +296,21 @@ Page({
     )
       this.store = sample();
     Demo.enrich(this.store);
+    Media.resolveStore(this.store);
     this.viewport = Gestures.identity();
     this._wheelTop = 15000;
     this.persistedFiles = filePaths(this.store);
     this.refresh();
+  },
+  mediaError(e){
+    const source=e.currentTarget.dataset.mediaSrc;
+    if(Media.failover(source)){
+      Media.resolveStore(this.store);this.refresh();
+      if(this.data.souvenir)this.setData({souvenir:this.store.souvenirs.find(s=>s.id===this.data.souvenir.id)});
+      return;
+    }
+    // Personal photos are never uploaded or rewritten by this handler.
+    if(!this.mediaWarningShown&&typeof source==='string'&&source.startsWith('https://')){this.mediaWarningShown=true;wx.showToast({title:'Preview photos need a network connection',icon:'none',duration:3000});}
   },
   onReady() {
     this.pageReady = true;
@@ -313,6 +326,8 @@ Page({
       wx.offMouseMove(this.mouseListener);
   },
   refresh() {
+    Media.resolveStore(this.store);
+    this.setData({media:Media.ui()});
     const trips = this.store.trips;
     const active = trips.find((t) => t.id === this.activeId) || trips[0];
     this.activeId = active && active.id;
@@ -441,7 +456,7 @@ Page({
         ? active.photos[0] ||
           (active.stops.find((s) => s.photos.length) || { photos: [] })
             .photos[0] ||
-          "/assets/sunset.jpg"
+          Media.url("sunset.jpg")
         : "",
       activeDays: active
         ? Math.max(
